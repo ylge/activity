@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>重定向和别名</title>
+    <style type="text/css">
+    </style>
+</head>
+
+<body>
+
+    <div id="app"></div>
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+<script type="text/javascript" src="js/vue-router.js"></script>
+<script>
+	/*
+	
+		别名
+		『重定向』的意思是，当用户访问 /a时，URL 将会被替换成 /b，然后匹配路由为 /b，那么『别名』又是什么呢？
+		/a 的别名是 /b，意味着，当用户访问 /b 时，URL 会保持为 /b，但是路由匹配则为 /a，就像用户访问 /a 一样。
+		上面对应的路由配置为：
+		const router = new VueRouter({
+		  routes: [
+		    { path: '/a', component: A, alias: '/b' }
+		  ]
+		})
+		『别名』的功能让你可以自由地将 UI 结构映射到任意的 URL，而不是受限于配置的嵌套路由结构。
+	 */
+    const UserHome = {
+        template: `
+			<div class="userhome"> UserHome </div>
+		`
+    }
+    const UserProfile = {
+        template: `
+			<div class="userprofile"> UserProfile </div>
+		`
+    }
+    const router = new VueRouter({
+        routes: [
+            {
+                path: '/uhome',
+                name: 'userhome',
+                // redirect: '/uprofile',//重定向
+                // alias: '/uprofile',//别名
+                // redirect: { name: 'userprofile'},
+                // redirect: to => {
+                // 	return { name: 'userprofile'}
+                // },
+                component: UserHome
+            },
+            {
+                path: '/uprofile',
+                name: 'userprofile',
+                component: UserProfile
+            }
+        ]
+    })
+    const app = new Vue({
+        router,
+        template: `
+			<div id="app">
+				<ul>
+					<li><router-link to="/uhome">go to User</router-link></li>
+					<li><router-link to="/uprofile">go to profile</router-link></li>
+				</ul>
+				<router-view></router-view>
+			</div>
+		`
+    }).$mount('#app')
+</script>
+
+</html>

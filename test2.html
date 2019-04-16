@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    
+    <link rel="stylesheet" href="https://cdn.bootcss.com/weui/1.1.3/style/weui.min.css">
+    <link rel="stylesheet" href="https://cdn.bootcss.com/jquery-weui/1.2.1/css/jquery-weui.min.css">
+    <link rel="stylesheet" href="css\style.css">
+</head>
+<body>
+    <!--搜索框-->
+    <header class="weui-header">
+        <div class="weui-search-bar_focusing" id="focusingBar">
+        <div class="weui-search-bar" id="searchBar">
+            <form class="weui-search-bar__form">
+              <div class="weui-search-bar__box">
+                <i class="weui-icon-search"></i>
+                <input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索您想要的商品！" required="">
+                <a href="javascript:" class="weui-icon-clear" id="searchClear"></a>
+              </div>
+              <label class="weui-search-bar__label" id="searchText">
+                <i class="weui-icon-search"></i>
+                <span>搜索您想要的商品！</span>
+              </label>
+            </form>
+            <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
+          </div>
+        </div>
+    </header>
+    <!--主体-->
+    <div class="weui-content">
+        <!--轮播图-->
+        <div class="swiper-container swiper-banner" data-space-between='10' data-pagination='.swiper-pagination' data-autoplay="1000">
+                <div class="swiper-wrapper">
+                  <div class="swiper-slide"><img src="upload\banner1.jpg" ></div>
+                  <div class="swiper-slide"><img src="upload\banner2.jpg" ></div>
+                  <div class="swiper-slide"><img src="upload\banner3.jpg" ></div>
+                </div>
+                <!--所有的分页符-->
+               <div class="swiper-pagination"></div>
+        </div>
+        <!--图标分类-->
+        <div class="weui-flex wy-iconlist-box">
+                <a class="wy-links-iconlist"><div class="img"><img src="images/icon-link1.png"></div><p>精选推荐</p></a>
+                <a class="wy-links-iconlist"><div class="img"><img src="images/icon-link2.png"></div><p>酒水专场</p></a>
+                <a class="wy-links-iconlist"><div class="img"><img src="images/icon-link3.png"></div><p>订单管理</p></a>
+                <a class="wy-links-iconlist"><div class="img"><img src="images/icon-link4.png"></div><p>商场入驻</p></a>
+        </div>
+        <!--新闻轮播-->
+        <div class="wy-ind-news">
+            <i class="news-icon-laba"></i>
+         <div class="swiper-container swiper-news " data-space-between='10' data-pagination='.swiper-pagination' data-autoplay="1000">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide"><a>热烈祝贺百度百科词条股份上市！</a></div>
+                <div class="swiper-slide"><a>阿里公司上市！</a></div>
+                <div class="swiper-slide"><a>热烈祝贺麦迪特无锡有限公司上市！</a></div>
+            </div>
+            <!--所有的分页符-->
+            <div class="swiper-pagination"></div> 
+        </div>
+            <i class="news-icon-more"></i> 
+        </div>
+        <!--精选推荐-->
+        <div class="wy-Module">
+            <div class="wy-Module-tit"><span>精选推荐</span></div>
+            <div class="wy-Module-con">
+              <div class="swiper-container swiper-jingxuan" style="padding-top:34px;">
+                <div class="swiper-wrapper">
+                  <div class="swiper-slide"><img src="upload\jingxuan1.jpg"></div>
+                  <div class="swiper-slide"><img src="upload\jingxuan2.jpg"></div>
+                  <div class="swiper-slide"><img src="upload\jingxuan3.jpg"></div>
+                  <div class="swiper-slide"><img src="upload\jingxuan5.jpg"></div>
+                  <div class="swiper-slide"><img src="upload\jingxuan4.jpg"></div>
+                  <div class="swiper-slide"><img src="upload\jingxuan3.jpg"></div>
+                </div>
+                <!-- Add Pagination -->
+                <div class="swiper-pagination jingxuan-pagination"></div>
+              </div>
+            </div>
+        </div>
+        <!--酒水推荐-->
+        <div class="wy-Module">
+                <div class="wy-Module-tit"><span>酒水推荐</span></div>
+                <div class="wy-Module-con">
+                  <div class="swiper-container swiper-jiushui" style="padding-top:34px;">
+                    <div class="swiper-wrapper">
+                      <div class="swiper-slide"><img src="upload\jingxuan1.jpg"></div>
+                      <div class="swiper-slide"><img src="upload\jingxuan2.jpg"></div>
+                      <div class="swiper-slide"><img src="upload\jingxuan3.jpg"></div>
+                      <div class="swiper-slide"><img src="upload\jingxuan5.jpg"></div>
+                      <div class="swiper-slide"><img src="upload\jingxuan4.jpg"></div>
+                      <div class="swiper-slide"><img src="upload\jingxuan3.jpg"></div>
+                      <div class="swiper-slide"><img src="upload\jingxuan1.jpg"></div>
+                      <div class="swiper-slide"><img src="upload\jingxuan2.jpg"></div>
+                      <div class="swiper-slide"><img src="upload\jingxuan3.jpg"></div>
+                      <div class="swiper-slide"><img src="upload\jingxuan4.jpg"></div>
+                    </div>
+                    <!-- Add Pagination -->
+                    <div class="swiper-pagination jingxuan-pagination"></div>
+                  </div>
+                </div>
+            </div>
+            <!--猜你喜欢-->
+        <div class="wy-Module">
+                <div class="wy-Module-tit-line"><span>猜你喜欢</span></div>
+                <div class="wy-Module-con">
+                  <div class="swiper-container swiper-jiushui" style="padding-top:34px;">
+                    <div class="swiper-wrapper">
+                      <div class="swiper-slide"><img src="upload\jingxuan1.jpg"></div>
+                      <div class="swiper-slide"><img src="upload\jingxuan2.jpg"></div>
+                      <div class="swiper-slide"><img src="upload\jingxuan3.jpg"></div>
+                      <div class="swiper-slide"><img src="upload\jingxuan5.jpg"></div>
+                      <div class="swiper-slide"><img src="upload\jingxuan4.jpg"></div>
+                      <div class="swiper-slide"><img src="upload\jingxuan3.jpg"></div>
+                      <div class="swiper-slide"><img src="upload\jingxuan1.jpg"></div>
+                      <div class="swiper-slide"><img src="upload\jingxuan2.jpg"></div>
+                      <div class="swiper-slide"><img src="upload\jingxuan3.jpg"></div>
+                      <div class="swiper-slide"><img src="upload\jingxuan4.jpg"></div>
+                    </div>
+                    <!-- Add Pagination -->
+                    <div class="swiper-pagination jingxuan-pagination"></div>
+                  </div>
+                </div>
+            </div>
+            
+
+
+
+
+    </div>
+
+
+
+    <!-- body 最后 -->
+    <script src="https://cdn.bootcss.com/jquery/1.11.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery-weui/1.2.1/js/jquery-weui.min.js"></script>
+    <!-- 如果使用了某些拓展插件还需要额外的JS -->
+    <script src="https://cdn.bootcss.com/jquery-weui/1.2.1/js/swiper.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery-weui/1.2.1/js/city-picker.min.js"></script>
+    <script type='text/javascript' src='/js/swiper.js' charset='utf-8'></script>
+    <script>
+        $(".swiper-banner").swiper({
+        loop: true,
+        autoplay: 3000
+      });
+        $(".swiper-news").swiper({
+            loop:true,
+            direction: 'vertical',
+		    paginationHide :true,
+            autoplay:3000
+        });
+        $(".swiper-jingxuan").swiper({
+		pagination: '.swiper-pagination',
+		loop: true,
+		paginationType:'fraction',
+        slidesPerView:3,
+        paginationClickable: true,
+        spaceBetween: 3
+      });
+      $(".swiper-jiushui").swiper({
+		pagination: '.swiper-pagination',
+		loop: true,
+		paginationType:'fraction',
+        slidesPerView:3,
+        slidesPerColumn: 2,
+        paginationClickable: true,
+        spaceBetween: 3
+      });
+        
+    </script>
+</body>
+</html>
