@@ -21,11 +21,11 @@
             <div class="weui-cell">
                 <div class="weui-cell__hd"><label class="weui-label">核销码</label></div>
                 <div class="weui-cell__bd">
-                    <input class="weui-input" type="text" name="orderCode" placeholder="请输入核销码">
+                    <input class="weui-input" type="text" id="orderCode" name="orderCode" placeholder="请输入核销码">
                 </div>
             </div>
 
-            <a href="javascript:;" class="weui-btn weui-btn_primary">确认验证</a>
+            <a href="javascript:;" onclick="orderClose()" class="weui-btn weui-btn_primary">确认验证</a>
             <a href="javascript:;" class="weui-btn weui-btn_primary">扫码核销</a>
         </div>
 
@@ -103,12 +103,13 @@
 </body>
 <script src="https://cdn.css.net/libs/vue/2.0.3/vue.js"></script>
 <script src="./js/vue-infinite-scroll.js"></script>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
 <script src="https://cdn.bootcss.com/axios/0.19.0-beta.1/axios.min.js"></script>
 <script>
     var remote_url = "http://192.168.137.1:8080";
+    var goodsId = getQueryString('i');
+    var userId = getQueryString('uid');
     window.onload = function () {
-        var goodsId = getQueryString('i');
-        var userId = getQueryString('uid');
         var vm = new Vue({
             el: '#app',
             data: {
@@ -118,13 +119,9 @@
                     storeIncome: 0,
                     storeWithdraw: 0,
                     store_user: [
-                        // { name: '张欢', value: '11' },
                         // { name: '李四', value: '1231' },
-                        // { name: 'Runoob1', value: '100' }
                     ],
                     order_list: [
-                        // { userName: '张欢', phone: '13524002701', status: 1, orderCode: 'nx1231231' },
-                        // { userName: '张欢', phone: '13524002701', status: 2, orderCode: 'nx1231231' },
                         // { userName: '张欢', phone: '13524002701', status: 3, orderCode: 'nx1231231' },
                     ]
                 }
@@ -141,18 +138,39 @@
                     axios.get(remote_url + '/h5/activity/manage/' + userId + '/' + goodsId)
                         .then(function (response) {
                             console.log(response.data);
-                            if(response.data.code === 200){
+                            if (response.data.code === 200) {
                                 temp.activity = Object.assign({}, response.data.data);
-                            }else{
+                            } else {
                                 $.alert(response.data.msg);
                             }
                         })
                         .catch(function (error) {
                             console.log(error);
+                            $.alert("网络错误");
                         });
                 }
             }
         });
+    }
+    function orderClose() {
+        var code = $("#orderCode").val();
+        if (code == undefined || code == null || code == '') {
+            $.alert("请输入核销码");
+            return;
+        }
+        let order = 'userId=' + userId + '&orderCode=' + code;
+        axios.post(remote_url + '/h5/activity/order/close', order)
+            .then(function (response) {
+                console.log(response.data);
+                if (response.data.code === 200) {
+                    $.toast("操作成功");
+                } else {
+                    $.alert(response.data.msg);
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
     }
     /**
             * 获取url参数

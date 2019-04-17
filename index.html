@@ -127,9 +127,10 @@
 
 <script>
     var remote_url = "http://192.168.137.1:8080";
+    var pid = getQueryString('pid');
+    var goodsId = getQueryString('i');
     window.onload = function () {
-        var pid = getQueryString('pid');
-        var goodsId = getQueryString('i');
+
         var vm = new Vue({
             el: '#app',
             data: {
@@ -141,18 +142,12 @@
                     activityMusic: '',
                     endTime: "",
                     scan_user: [
-                        // { nickName: '张欢', avatar: 'http://ppqnam2qx.bkt.clouddn.com/FvG41YMFLOr5OffW_h8IepTFk173' },
                         // { nickName: '李四', avatar: 'http://ppqnam2qx.bkt.clouddn.com/FvG41YMFLOr5OffW_h8IepTFk173' },
-                        // { nickName: 'Runoob1', avatar: 'http://ppqnam2qx.bkt.clouddn.com/FvG41YMFLOr5OffW_h8IepTFk173' }
                     ],
                     join_user: [
-                        //{ userName: '张欢', phone: '13524002701', createTime: '2019-05-01 10:00:00', status: 1, avatar: 'http://ppqnam2qx.bkt.clouddn.com/FvG41YMFLOr5OffW_h8IepTFk173' },
-                        //{ userName: '张欢', phone: '13524002701', createTime: '2019-05-01 10:00:00', status: 2, avatar: 'http://ppqnam2qx.bkt.clouddn.com/FvG41YMFLOr5OffW_h8IepTFk173' },
                         //{ userName: '张欢', phone: '13524002701', createTime: '2019-05-01 10:00:00', status: 3, avatar: 'http://ppqnam2qx.bkt.clouddn.com/FvG41YMFLOr5OffW_h8IepTFk173' },
                     ],
                     reward_list: [
-                        // { userName: '张欢', childNum: 1, rewardAmount: 40 },
-                        // { userName: '张欢', childNum: 2, rewardAmount: 80 },
                         // { userName: '张欢', childNum: 4, rewardAmount: 160 }
                     ]
                 },
@@ -175,6 +170,7 @@
                         })
                         .catch(function (error) {
                             console.log(error);
+                            $.alert("网络错误");
                         });
                 },
                 loadMore: function () {
@@ -193,15 +189,15 @@
     //获取订单列表
     function createOrder() {
         var order = {
-            "goodsId":2,
-            "phone":$("#userPhone").val(),
-            "userId":2,
-            "userName":$("#userName").val(),
-            "openid":1231231,
-            "pUserId":3,
+            "goodsId": goodsId,
+            "phone": $("#userPhone").val(),
+            "userId": 2,
+            "userName": $("#userName").val(),
+            "openid": 1231231,
+            "pUserId": pid,
         }
         console.log(order);
-        axios.post(remote_url + '/h5/activity/order/add',order)
+        axios.post(remote_url + '/h5/activity/order/add', order)
             .then(function (response) {
                 console.log(response.data);
             })
