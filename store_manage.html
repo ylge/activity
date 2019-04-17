@@ -56,20 +56,20 @@
                         </div>
                         <div class="weui-form-preview__hd">
                             <label class="weui-form-preview__label">总收入（元）</label>
-                            <em class="weui-form-preview__value">{{activity.totalAmount}}</em>
+                            <em class="weui-form-preview__value">{{activity.storeIncome}}</em>
                         </div>
                         <div class="weui-form-preview__hd">
                             <label class="weui-form-preview__label">支出金额（元）</label>
-                            <em class="weui-form-preview__value">{{activity.withdraw}}</em>
+                            <em class="weui-form-preview__value">{{activity.storeWithdraw}}</em>
                         </div>
                     </div>
                     <div id="tab2" class="weui-tab__bd-item">
                         <div class="weui-cells">
                             <div v-for="storeUser in activity.store_user" class="weui-cell">
                                 <div class="weui-cell__bd">
-                                    <p>{{storeUser.name}}</p>
+                                    <p>{{storeUser.userName}}</p>
                                 </div>
-                                <div class="weui-cell__ft" style="color:green">推广人数：{{storeUser.value}}</div>
+                                <div class="weui-cell__ft" style="color:green">推广人数：{{storeUser.countNum}}</div>
                             </div>
                         </div>
                     </div>
@@ -101,48 +101,71 @@
     </div>
 
 </body>
-<script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+<script src="https://cdn.css.net/libs/vue/2.0.3/vue.js"></script>
+<script src="./js/vue-infinite-scroll.js"></script>
+<script src="https://cdn.bootcss.com/axios/0.19.0-beta.1/axios.min.js"></script>
 <script>
+    var remote_url = "http://192.168.137.1:8080";
     window.onload = function () {
+        var goodsId = getQueryString('i');
+        var userId = getQueryString('uid');
         var vm = new Vue({
             el: '#app',
             data: {
                 activity: {
                     scanNumber: 0,
                     joinNumber: 0,
-                    totalAmount: 0,
-                    withdraw: 0,
+                    storeIncome: 0,
+                    storeWithdraw: 0,
                     store_user: [
-                        { name: '张欢', value: '11' },
-                        { name: '李四', value: '1231' },
-                        { name: 'Runoob1', value: '100' }
+                        // { name: '张欢', value: '11' },
+                        // { name: '李四', value: '1231' },
+                        // { name: 'Runoob1', value: '100' }
                     ],
                     order_list: [
-                        { userName: '张欢', phone: '13524002701', status: 1, orderCode: 'nx1231231' },
-                        { userName: '张欢', phone: '13524002701', status: 2, orderCode: 'nx1231231' },
-                        { userName: '张欢', phone: '13524002701', status: 3, orderCode: 'nx1231231' },
+                        // { userName: '张欢', phone: '13524002701', status: 1, orderCode: 'nx1231231' },
+                        // { userName: '张欢', phone: '13524002701', status: 2, orderCode: 'nx1231231' },
+                        // { userName: '张欢', phone: '13524002701', status: 3, orderCode: 'nx1231231' },
                     ]
                 }
 
             },
-            // created() {
-            //     this.get();
-            // },
+            created() {
+                this.getActivityData(goodsId, userId);
+            },
             methods: {
-                get: function () {
+                //获取活动数据
+                getActivityData: function (goodsId) {
+                    var temp = this;
                     //发送get请求
-                    this.$http.get('/h5/activity/total').then(function (res) {
-                        console.log(res.body);
-                        this.a = res.body;
-                    }, function () {
-                        console.log('请求失败处理');
-                    });
+                    axios.get(remote_url + '/h5/activity/manage/' + userId + '/' + goodsId)
+                        .then(function (response) {
+                            console.log(response.data);
+                            if(response.data.code === 200){
+                                temp.activity = Object.assign({}, response.data.data);
+                            }else{
+                                $.alert(response.data.msg);
+                            }
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
                 }
             }
         });
     }
-
-
+    /**
+            * 获取url参数
+            * @param name
+            * @returns {null}
+            * @constructor
+            */
+    function getQueryString(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]);
+        return null;
+    };
 </script>
 <script src="https://cdn.bootcss.com/jquery/1.11.0/jquery.min.js"></script>
 <script src="https://cdn.bootcss.com/jquery-weui/1.2.1/js/jquery-weui.min.js"></script>
