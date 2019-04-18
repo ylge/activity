@@ -33,9 +33,12 @@
         <img :src="activity.goodsImage" width="100%" />
         <div class="weui-flex">
             <div class="weui-flex__item">
-                <div class="placeholder" style="text-align: center;">
+                <div v-show="!activity.isEnd" class="placeholder" style="text-align: center;">
                     <h4>距离活动结束:</h4>
                     <div id="timer" style="font-size:20px">0天0小时0分0秒</div>
+                </div>
+                <div v-show="activity.isEnd" class="placeholder" style="text-align: center;">
+                    <h3 style="color:red">活动已结束</h4>
                 </div>
             </div>
         </div>
@@ -81,7 +84,6 @@
                                 <div class="weui-cell__bd"></div>
                                 <div class="weui-cell__ft">
                                     佣金<span style="color:red">￥{{reward.rewardAmount}}</span>元
-
                                     <!-- <br> {{order.createTime}} -->
                                 </div>
                             </div>
@@ -91,7 +93,7 @@
             </div>
         </div>
         <img :src="activity.goodsDetail" width="100%" />
-        <div style="overflow:hidden; position: fixed;bottom: 0;width: 100%;z-index: 10;text-align: center">
+        <div v-show="!activity.isEnd" style="overflow:hidden; position: fixed;bottom: 0;width: 100%;z-index: 10;text-align: center">
             <a href="javascript:;" style="background:tomato;width: 49%;height: 30px;line-height:30px;display: inline-block;" class="open-popup"
                 data-target="#formAdd">点击购买</a>
             <a href="javascript:;" style="background:rgba(20, 180, 68, 0.877);width: 49%;height: 30px;line-height:30px;display: inline-block;"
@@ -137,6 +139,8 @@
                 activity: {
                     scanNumber: 0,
                     joinNumber: 0,
+                    status: 1,
+                    isEnd:false,
                     goodsImage: '',
                     goodsDetail: '',
                     activityMusic: '',
@@ -165,8 +169,13 @@
                         .then(function (response) {
                             temp.activity = Object.assign({}, response.data.data);
                             console.log(temp.activity);
-                            var endDate = temp.activity.endTime.split("-");
-                            setInterval("Timer(" + endDate[0] + "," + endDate[1] + "," + endDate[2] + ",00,00,00)", 1000);
+                            if (temp.activity.status == 0) {
+                                temp.activity.isEnd = true;
+                                $.alert("该活动已结束");
+                            } else {
+                                var endDate = temp.activity.endTime.split("-");
+                                setInterval("Timer(" + endDate[0] + "," + endDate[1] + "," + endDate[2] + ",00,00,00)", 1000);
+                            }
                         })
                         .catch(function (error) {
                             console.log(error);
