@@ -28,8 +28,8 @@
     </style>
 </head>
 
-<body ontouchstart>
-    <div v-show="is_weixn()" id="app" :style="`background:url(${activity.backgroundImage})`">
+<body>
+    <div v-if="isOpen" id="app" :style="`background:url(${activity.backgroundImage})`">
         <img :src="activity.goodsImage" width="100%" />
         <div class="weui-flex">
             <div class="weui-flex__item">
@@ -64,7 +64,7 @@
                                     <div v-if="order.status === 3">已核销</div>
                                     <div v-if="order.status === 2" style="color:green">已支付</div>
                                     <div v-if="order.status === 1" style="color:rebeccapurple">待支付</div>
-                                    <!-- <br> {{order.createTime}} -->
+                                    <span style="color:red"> {{order.createTime}}</span>
                                 </div>
                             </div>
                         </div>
@@ -123,14 +123,13 @@
         </div>
     </div>
 </body>
-<!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script> -->
 <script src="https://cdn.css.net/libs/vue/2.0.3/vue.js"></script>
 <script src="./js/vue-infinite-scroll.js"></script>
 <script src="https://cdn.bootcss.com/axios/0.19.0-beta.1/axios.min.js"></script>
 
 <script>
-    // var remote_url = "http://b8d75faa.ngrok.io";
-    var remote_url = "http://192.168.137.1:8080";
+    var remote_url = "http://f8b57f9e.ngrok.io";
+    // var remote_url = "http://192.168.137.1:8080";
     var pid = getQueryString('pid');
     var goodsId = getQueryString('i');
     var code = getQueryString('code');
@@ -138,6 +137,7 @@
         var vm = new Vue({
             el: '#app',
             data: {
+                isOpen: false,
                 activity: {
                     scanNumber: 0,
                     joinNumber: 0,
@@ -162,15 +162,30 @@
 
             },
             created() {
-                if(!is_weixn()){
+                if (!isWeiXin()) {
                     $.alert("请在微信打开");
-                }
-                console.log(code);
-                if (code != null) {
-                    this.getActivityGoods(goodsId);
+                } else {
+                    if (code != null) {
+                        this.isOpen = true;
+                        this.createUser(code);
+                        this.getActivityGoods(goodsId);
+                    } else {
+                        console.log("用户授权");
+                        this.getCode();
+                    }
                 }
             },
             methods: {
+                //获取微信code
+                getCode: function () {
+                    axios.get(remote_url + '/h5/activity/getCode/'+goodsId+'/null').then(function (response) {
+                        console.log(response.data);
+                        window.open(response.data.data);
+                    }).catch(function (error) {
+                        console.log(error);
+                        $.alert("网络错误");
+                    });
+                },
                 //获取活动数据
                 getActivityGoods: function (goodsId) {
                     var temp = this;
@@ -193,6 +208,16 @@
                             $.alert("网络错误");
                         });
                 },
+                createUser: function (code) {
+                    let userCode = 'goodsId=' + goodsId + '&code=' + code;
+                    axios.post(remote_url + '/h5/activity/user/add', userCode)
+                        .then(function (response) {
+                            console.log(response.data);
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                },
                 loadMore: function () {
                     this.busy = true;
                     setTimeout(() => {
@@ -206,7 +231,7 @@
 
         });
     }
-    //获取订单列表
+    //下单
     function createOrder() {
         var order = {
             "goodsId": goodsId,
@@ -265,12 +290,13 @@
         return null;
     };
 
-    function is_weixn() {
+    function isWeiXin() {
         var ua = navigator.userAgent.toLowerCase();
         if (ua.match(/MicroMessenger/i) == "micromessenger") {
             return true;
         } else {
-            return false;
+            return true;
+            // return false;
         }
     }
 </script>
