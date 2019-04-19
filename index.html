@@ -29,7 +29,7 @@
 </head>
 
 <body ontouchstart>
-    <div id="app" :style="`background:url(${activity.backgroundImage})`">
+    <div v-show="is_weixn()" id="app" :style="`background:url(${activity.backgroundImage})`">
         <img :src="activity.goodsImage" width="100%" />
         <div class="weui-flex">
             <div class="weui-flex__item">
@@ -133,8 +133,8 @@
     var remote_url = "http://192.168.137.1:8080";
     var pid = getQueryString('pid');
     var goodsId = getQueryString('i');
+    var code = getQueryString('code');
     window.onload = function () {
-
         var vm = new Vue({
             el: '#app',
             data: {
@@ -148,7 +148,7 @@
                     backgroundImage: '',
                     activityMusic: '',
                     endTime: '',
-                    storeName :'',
+                    storeName: '',
                     scan_user: [
                         // { nickName: '李四', avatar: 'http://ppqnam2qx.bkt.clouddn.com/FvG41YMFLOr5OffW_h8IepTFk173' },
                     ],
@@ -162,7 +162,13 @@
 
             },
             created() {
-                this.getActivityGoods(goodsId);
+                if(!is_weixn()){
+                    $.alert("请在微信打开");
+                }
+                console.log(code);
+                if (code != null) {
+                    this.getActivityGoods(goodsId);
+                }
             },
             methods: {
                 //获取活动数据
@@ -258,6 +264,15 @@
         if (r != null) return unescape(r[2]);
         return null;
     };
+
+    function is_weixn() {
+        var ua = navigator.userAgent.toLowerCase();
+        if (ua.match(/MicroMessenger/i) == "micromessenger") {
+            return true;
+        } else {
+            return false;
+        }
+    }
 </script>
 <script src="https://cdn.bootcss.com/jquery/1.11.0/jquery.min.js"></script>
 <script src="https://cdn.bootcss.com/jquery-weui/1.2.1/js/jquery-weui.min.js"></script>
