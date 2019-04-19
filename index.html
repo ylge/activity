@@ -38,7 +38,8 @@
                     <div id="timer" style="font-size:20px">0天0小时0分0秒</div>
                 </div>
                 <div v-show="activity.isEnd" class="placeholder" style="text-align: center;">
-                    <h3 style="color:red">活动已结束</h4>
+                    <h3 style="color:red">活动已结束
+                        </h4>
                 </div>
             </div>
         </div>
@@ -128,6 +129,7 @@
 <script src="https://cdn.bootcss.com/axios/0.19.0-beta.1/axios.min.js"></script>
 
 <script>
+    // var remote_url = "http://b8d75faa.ngrok.io";
     var remote_url = "http://192.168.137.1:8080";
     var pid = getQueryString('pid');
     var goodsId = getQueryString('i');
@@ -140,12 +142,13 @@
                     scanNumber: 0,
                     joinNumber: 0,
                     status: 1,
-                    isEnd:false,
+                    isEnd: false,
                     goodsImage: '',
                     goodsDetail: '',
                     backgroundImage: '',
                     activityMusic: '',
-                    endTime: "",
+                    endTime: '',
+                    storeName :'',
                     scan_user: [
                         // { nickName: '李四', avatar: 'http://ppqnam2qx.bkt.clouddn.com/FvG41YMFLOr5OffW_h8IepTFk173' },
                     ],
@@ -170,6 +173,7 @@
                         .then(function (response) {
                             temp.activity = Object.assign({}, response.data.data);
                             console.log(temp.activity);
+                            document.title = temp.activity.storeName;
                             if (temp.activity.status == 0) {
                                 temp.activity.isEnd = true;
                                 $.alert("该活动已结束");
