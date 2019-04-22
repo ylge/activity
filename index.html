@@ -19,10 +19,27 @@
         }
 
         .avatar {
-            width: 44px;
-            height: 44px;
+            width: 35px;
+            height: 35px;
             /* border-radius: 50%; */
             /* margin: 15px auto; */
+            /* cursor: pointer; */
+        }
+
+        .avatar1 {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            /* margin: 15px auto; */
+            /* cursor: pointer; */
+        }
+
+        .scan_li {
+            width: 50px;
+            height: 30px;
+            float: left;
+            list-style: none;
+            margin: 10px auto;
             /* cursor: pointer; */
         }
     </style>
@@ -45,30 +62,48 @@
         </div>
         <div class="weui-flex">
             <div class="weui-flex__item">
-                <div class="placeholder">参与人数({{activity.scanNumber}}人)</div>
+                <div class="placeholder">参与人数({{activity.scanNumber}}人)
+                    <div class="weui-panel weui-panel_access">
+                        <ul v-for="user in activity.scan_user" style="font-size:15px">
+                            <li class="scan_li" class="weui-cell">
+                                <div class="weui-cell__hd">
+                                    <img :src=user.avatar class="avatar1">
+                                </div>
+                                <!-- <div class="weui-cell__bd">&nbsp;{{user.nickName}}</div> -->
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
             </div>
         </div>
         <div class="weui-flex">
             <div class="weui-flex__item">
                 <div class="placeholder">报名记录({{activity.joinNumber}}人)
-                    <div v-infinite-scroll="loadMore" infinite-scroll-disabled="busy" infinite-scroll-distance="2">
-                        <div class="weui-cells">
-                            <div v-for="order in activity.join_user" class="weui-cell">
-                                <div class="weui-cell__hd">
-                                    <img :src=order.avatar class="avatar">
-                                </div>
-                                <div class="weui-cell__bd">
-                                    {{order.userName}}<br>{{order.phone}}
-                                </div>
-                                <div class="weui-cell__ft">
-                                    <div v-if="order.status === 3">已核销</div>
-                                    <div v-if="order.status === 2" style="color:green">已支付</div>
-                                    <div v-if="order.status === 1" style="color:rebeccapurple">待支付</div>
-                                    <span style="color:red"> {{order.createTime}}</span>
-                                </div>
-                            </div>
+                    <div class="weui-panel weui-panel_access">
+                        <div class="myscroll">
+                            <ul class="weui-cells" style="font-size:15px">
+                                <li v-for="order in activity.join_user" class="weui-cell">
+                                    <div class="weui-cell__hd">
+                                        <img :src=order.avatar class="avatar">
+                                    </div>
+                                    <div class="weui-cell__bd">
+                                        {{order.userName}}<br>{{order.phone}}
+                                    </div>
+                                    <div class="weui-cell__bd">
+                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                    </div>
+                                    <div class="weui-cell__ft">
+                                        <div v-if="order.status === 3">已核销</div>
+                                        <div v-if="order.status === 2" style="color:green">已支付</div>
+                                        <div v-if="order.status === 1" style="color:rebeccapurple">待支付</div>
+                                        <span style="color:red"> {{order.createTime}}</span>
+                                    </div>
+                                </li>
+                            </ul>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -76,18 +111,14 @@
         <div class="weui-flex">
             <div class="weui-flex__item">
                 <div class="placeholder" style="text-align: center;">活动佣金排行榜
-                    <div v-infinite-scroll="loadMore" infinite-scroll-disabled="busy" infinite-scroll-distance="2">
-                        <div class="weui-cells">
-                            <div v-for="reward in activity.reward_list" class="weui-cell">
-                                <div class="weui-cell__hd">
-                                    {{reward.userName}}
-                                </div>
-                                <div class="weui-cell__bd"></div>
-                                <div class="weui-cell__ft">
-                                    佣金<span style="color:red">￥{{reward.rewardAmount}}</span>元
-                                    <!-- <br> {{order.createTime}} -->
-                                </div>
-                            </div>
+                    <div class="weui-panel weui-panel_access">
+                        <div class="myscroll">
+                            <ul style="width:100%;min-width:100%;">
+                                <li v-for="reward in activity.reward_list" class="weui-flex">
+                                    <span class="weui-flex__item" style="text-align:left;">{{reward.userName}}</span>
+                                    <span class="weui-flex__item" style="text-align:right">佣金:<span style="color:red;display: inline-block;">￥{{reward.rewardAmount}}</span>元</span>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -108,147 +139,156 @@
                     <div class="weui-cell">
                         <div class="weui-cell__hd"><label class="weui-label">姓名</label></div>
                         <div class="weui-cell__bd">
-                            <input class="weui-input" type="text" id="userName" name="userName" placeholder="请输入姓名">
+                            <input class="weui-input" type="text" ref="userName" name="userName" placeholder="请输入姓名">
                         </div>
                     </div>
                     <div class="weui-cell">
                         <div class="weui-cell__hd"><label class="weui-label">手机号</label></div>
                         <div class="weui-cell__bd">
-                            <input class="weui-input" type="text" id="userPhone" name="userPhone" placeholder="请输入手机号">
+                            <input class="weui-input" type="text" ref="userPhone" name="userPhone" placeholder="请输入手机号">
                         </div>
                     </div>
-                    <a href="javascript:;" onclick="createOrder()" class="weui-btn weui-btn_primary">确认提交</a>
+                    <a href="javascript:;" @click="createOrder" class="weui-btn weui-btn_primary">确认提交</a>
                 </div>
             </div>
         </div>
     </div>
 </body>
+<script src="https://cdn.bootcss.com/jquery/1.11.0/jquery.min.js"></script>
+<script src="./js/jquery.vticker.min.js"></script>
+<script src="./js/jcarousellite_1.0.1c4.js"></script>
 <script src="https://cdn.css.net/libs/vue/2.0.3/vue.js"></script>
-<script src="./js/vue-infinite-scroll.js"></script>
 <script src="https://cdn.bootcss.com/axios/0.19.0-beta.1/axios.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/vue-seamless-scroll@1.1.12/dist/vue-seamless-scroll.min.js"></script>
 <script>
-    var remote_url = "http://f8b57f9e.ngrok.io";
-    // var remote_url = "http://192.168.137.1:8080";
+    // var remote_url = "http://dd1079eb.ngrok.io";
+    var remote_url = "http://127.0.0.1:8080";
     var pid = getQueryString('pid');
     var goodsId = getQueryString('i');
     var code = getQueryString('code');
-    window.onload = function () {
-        var vm = new Vue({
-            el: '#app',
-            data: {
-                isOpen: false,
-                activity: {
-                    scanNumber: 0,
-                    joinNumber: 0,
-                    status: 1,
-                    isEnd: false,
-                    goodsImage: '',
-                    goodsDetail: '',
-                    backgroundImage: '',
-                    activityMusic: '',
-                    endTime: '',
-                    storeName: '',
-                    scan_user: [
-                        // { nickName: '李四', avatar: 'http://ppqnam2qx.bkt.clouddn.com/FvG41YMFLOr5OffW_h8IepTFk173' },
-                    ],
-                    join_user: [
-                        //{ userName: '张欢', phone: '13524002701', createTime: '2019-05-01 10:00:00', status: 3, avatar: 'http://ppqnam2qx.bkt.clouddn.com/FvG41YMFLOr5OffW_h8IepTFk173' },
-                    ],
-                    reward_list: [
-                        // { userName: '张欢', childNum: 4, rewardAmount: 160 }
-                    ]
-                },
-
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            isOpen: true,
+            userId: 1,
+            isOrder: 0,
+            animate: false,
+            activity: {
+                scanNumber: 0,
+                joinNumber: 0,
+                status: 1,
+                isEnd: false,
+                goodsImage: '',
+                goodsDetail: '',
+                backgroundImage: '',
+                activityMusic: '',
+                endTime: '',
+                storeName: '',
+                scan_user: [
+                    // { nickName: '李四', avatar: 'http://ppqnam2qx.bkt.clouddn.com/FvG41YMFLOr5OffW_h8IepTFk173' },
+                ],
+                join_user: [
+                    // { userName: '张欢', phone: '13524002701', createTime: '2019-05-01 10:00:00', status: 3, avatar: 'http://ppqnam2qx.bkt.clouddn.com/FvG41YMFLOr5OffW_h8IepTFk173' },
+                ],
+                reward_list: [
+                    // { userName: '张欢', childNum: 4, rewardAmount: 160 }
+                ]
+            }
+        },
+        created() {
+            this.getActivityGoods(goodsId);
+            // setInterval(this.scroll, 1000);
+            // if (!isWeiXin()) {
+            //     $.alert("请在微信打开");
+            // } else {
+            //     if (code != null) {
+            //         this.isOpen = true;
+            //         this.createUser(code);
+            //         this.getActivityGoods(goodsId);
+            //     } else {
+            //         console.log("用户授权");
+            //         this.getCode();
+            //     }
+            // }
+        },
+        methods: {
+            //获取微信code
+            getCode: function () {
+                axios.get(remote_url + '/h5/activity/getCode/' + goodsId + '/null').then(function (response) {
+                    console.log(response.data);
+                    window.open(response.data.data);
+                }).catch(function (error) {
+                    console.log(error);
+                    $.alert("网络错误");
+                });
             },
-            created() {
-                if (!isWeiXin()) {
-                    $.alert("请在微信打开");
-                } else {
-                    if (code != null) {
-                        this.isOpen = true;
-                        this.createUser(code);
-                        this.getActivityGoods(goodsId);
-                    } else {
-                        console.log("用户授权");
-                        this.getCode();
-                    }
-                }
-            },
-            methods: {
-                //获取微信code
-                getCode: function () {
-                    axios.get(remote_url + '/h5/activity/getCode/'+goodsId+'/null').then(function (response) {
-                        console.log(response.data);
-                        window.open(response.data.data);
-                    }).catch(function (error) {
+            //获取活动数据
+            getActivityGoods: function (goodsId) {
+                var temp = this;
+                //发送get请求
+                axios.get(remote_url + '/h5/activity/goods/' + goodsId)
+                    .then(function (response) {
+                        temp.activity = Object.assign({}, response.data.data);
+                        document.title = temp.activity.storeName;
+                        if (temp.activity.status == 0) {
+                            temp.activity.isEnd = true;
+                            $.alert("该活动已结束");
+                        } else {
+                            var endDate = temp.activity.endTime.split("-");
+                            setInterval("Timer(" + endDate[0] + "," + endDate[1] + "," + endDate[2] + ",00,00,00)", 1000);
+                        }
+                    })
+                    .catch(function (error) {
                         console.log(error);
                         $.alert("网络错误");
                     });
-                },
-                //获取活动数据
-                getActivityGoods: function (goodsId) {
-                    var temp = this;
-                    //发送get请求
-                    axios.get(remote_url + '/h5/activity/goods/' + goodsId)
-                        .then(function (response) {
-                            temp.activity = Object.assign({}, response.data.data);
-                            console.log(temp.activity);
-                            document.title = temp.activity.storeName;
-                            if (temp.activity.status == 0) {
-                                temp.activity.isEnd = true;
-                                $.alert("该活动已结束");
-                            } else {
-                                var endDate = temp.activity.endTime.split("-");
-                                setInterval("Timer(" + endDate[0] + "," + endDate[1] + "," + endDate[2] + ",00,00,00)", 1000);
-                            }
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                            $.alert("网络错误");
-                        });
-                },
-                createUser: function (code) {
-                    let userCode = 'goodsId=' + goodsId + '&code=' + code;
-                    axios.post(remote_url + '/h5/activity/user/add', userCode)
-                        .then(function (response) {
-                            console.log(response.data);
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        });
-                },
-                loadMore: function () {
-                    this.busy = true;
-                    setTimeout(() => {
-                        this.page++;
-                        // getOrderLists;
-                        this.busy = false;
-                    }, 1000);
+            },
+            createUser: function (code) {
+                var temp = this;
+                let userCode = 'goodsId=' + goodsId + '&code=' + code;
+                axios.post(remote_url + '/h5/activity/user/add', userCode)
+                    .then(function (response) {
+                        temp.userId = response.data.data.userId;
+                        temp.isOrder = response.data.data.isOrder;
+                        console.log(response.data);
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            //下单
+            createOrder: function () {
+                var order = {
+                    "goodsId": goodsId,
+                    "phone": this.$refs.userPhone.value,
+                    "userId": this.userId,
+                    "userName": this.$refs.userName.value,
+                    "openid": "",
+                    "pUserId": pid,
                 }
-
-            }
-
-        });
-    }
-    //下单
-    function createOrder() {
-        var order = {
-            "goodsId": goodsId,
-            "phone": $("#userPhone").val(),
-            "userId": 2,
-            "userName": $("#userName").val(),
-            "openid": 1231231,
-            "pUserId": pid,
+                console.log(order);
+                axios.post(remote_url + '/h5/activity/order/add', order)
+                    .then(function (response) {
+                        console.log(response.data);
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            timeout1: function (ms) {
+                return new Promise(resolve => {
+                    setTimeout(resolve, ms);
+                })
+            },
         }
-        console.log(order);
-        axios.post(remote_url + '/h5/activity/order/add', order)
-            .then(function (response) {
-                console.log(response.data);
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
+    });
+    window.onload = function () {
+        setTimeout(function () {
+            $('.myscroll').vTicker({
+                showItems: 3,
+                animation:'fade'
+            }), 5000
+        })
     }
 
     //倒计时
@@ -300,9 +340,8 @@
         }
     }
 </script>
-<script src="https://cdn.bootcss.com/jquery/1.11.0/jquery.min.js"></script>
-<script src="https://cdn.bootcss.com/jquery-weui/1.2.1/js/jquery-weui.min.js"></script>
 
+<script src="https://cdn.bootcss.com/jquery-weui/1.2.1/js/jquery-weui.min.js"></script>
 <!-- 如果使用了某些拓展插件还需要额外的JS -->
 <script src="https://cdn.bootcss.com/jquery-weui/1.2.1/js/swiper.min.js"></script>
 
