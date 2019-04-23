@@ -81,8 +81,9 @@
         <div class="weui-flex">
             <div class="weui-flex__item">
                 <div class="placeholder">报名记录({{activity.joinNumber}}人)
-                    <div class="weui-panel weui-panel_access">
-                        <div class="myscroll">
+                    <div class="weui-panel weui-panel_access" style="height:130px">
+                        <!-- <div class="myscroll"> -->
+                        <vue-seamless-scroll :data="activity.join_user" :class-option="classOption">
                             <ul class="weui-cells" style="font-size:15px">
                                 <li v-for="order in activity.join_user" class="weui-cell">
                                     <div class="weui-cell__hd">
@@ -92,7 +93,7 @@
                                         {{order.userName}}<br>{{order.phone}}
                                     </div>
                                     <div class="weui-cell__bd">
-                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                     </div>
                                     <div class="weui-cell__ft">
                                         <div v-if="order.status === 3">已核销</div>
@@ -102,7 +103,9 @@
                                     </div>
                                 </li>
                             </ul>
-                        </div>
+                        </vue-seamless-scroll>
+
+                        <!-- </div> -->
                     </div>
 
                 </div>
@@ -113,23 +116,30 @@
             <div class="weui-flex__item">
                 <div class="placeholder" style="text-align: center;">活动佣金排行榜
                     <div class="weui-panel weui-panel_access">
-                        <div class="myscroll">
+                        <!-- <div class="myscroll"> -->
+                        <vue-seamless-scroll :data="activity.reward_list" :class-option="classOption">
                             <ul style="width:100%;min-width:100%;">
                                 <li v-for="reward in activity.reward_list" class="weui-flex">
                                     <span class="weui-flex__item" style="text-align:left;">{{reward.userName}}</span>
-                                    <span class="weui-flex__item" style="text-align:right">佣金:<span style="color:red;display: inline-block;">￥{{reward.rewardAmount}}</span>元</span>
+                                    <span class="weui-flex__item" style="text-align:right">佣金:<span
+                                            style="color:red;display: inline-block;">￥{{reward.rewardAmount}}</span>元</span>
                                 </li>
                             </ul>
-                        </div>
+                        </vue-seamless-scroll>
+
+                        <!-- </div> -->
                     </div>
                 </div>
             </div>
         </div>
         <img :src="activity.goodsDetail" width="100%" />
-        <div v-show="!activity.isEnd" style="overflow:hidden; position: fixed;bottom: 0;width: 100%;z-index: 10;text-align: center">
-            <a href="javascript:;" style="background:tomato;width: 49%;height: 30px;line-height:30px;display: inline-block;" class="open-popup"
-                data-target="#formAdd">点击购买</a>
-            <a href="javascript:;" style="background:rgba(20, 180, 68, 0.877);width: 49%;height: 30px;line-height:30px;display: inline-block;"
+        <div v-show="!activity.isEnd"
+            style="overflow:hidden; position: fixed;bottom: 0;width: 100%;z-index: 10;text-align: center">
+            <a href="javascript:;"
+                style="background:tomato;width: 49%;height: 30px;line-height:30px;display: inline-block;"
+                class="open-popup" data-target="#formAdd">点击购买</a>
+            <a href="javascript:;"
+                style="background:rgba(20, 180, 68, 0.877);width: 49%;height: 30px;line-height:30px;display: inline-block;"
                 class="open-popup" data-target="#formAdd">分享赚赏金</a>
         </div>
 
@@ -164,14 +174,14 @@
 
 </body>
 <script src="https://cdn.bootcss.com/jquery/1.11.0/jquery.min.js"></script>
-<script src="./js/jquery.vticker.min.js"></script>
-<!-- <script src="./js/jcarousellite_1.0.1c4.js"></script> -->
-<script src="https://cdn.css.net/libs/vue/2.0.3/vue.js"></script>
+<!-- <script src="./js/jquery.vticker.min.js"></script> -->
+<script src="https://cdn.bootcss.com/vue/2.5.9/vue.js"></script>
 <script src="https://cdn.bootcss.com/axios/0.19.0-beta.1/axios.min.js"></script>
-<!-- <script src="https://cdn.jsdelivr.net/npm/vue-seamless-scroll@1.1.12/dist/vue-seamless-scroll.min.js"></script> -->
+<script src="./js/vue-seamless-scroll.min.js"></script>
+<script src="https://cdn.bootcss.com/jquery-weui/1.2.1/js/jquery-weui.min.js"></script>
 <script>
-    // var remote_url = "http://dd1079eb.ngrok.io";
-    var remote_url = "http://127.0.0.1:8080";
+    var remote_url = "http://57e09ac7.ngrok.io";
+    // var remote_url = "http://127.0.0.1:8080";
     var pid = getQueryString('pid');
     var goodsId = getQueryString('i');
     var code = getQueryString('code');
@@ -205,21 +215,28 @@
                 ]
             }
         },
+        computed: {
+            classOption: function () {
+                return {
+                    step: 0.5,
+                    limitMoveNum: 3
+                }
+            }
+        },
         created() {
-            this.getActivityGoods(goodsId);
-            // setInterval(this.scroll, 1000);
-            // if (!isWeiXin()) {
-            //     $.alert("请在微信打开");
-            // } else {
-            //     if (code != null) {
-            //         this.isOpen = true;
-            //         this.createUser(code);
-            //         this.getActivityGoods(goodsId);
-            //     } else {
-            //         console.log("用户授权");
-            //         this.getCode();
-            //     }
-            // }
+            // this.getActivityGoods(goodsId);
+            if (!isWeiXin()) {
+                $.alert("请在微信打开");
+            } else {
+                if (code != null) {
+                    this.isOpen = true;
+                    this.createUser(code);
+                    this.getActivityGoods(goodsId);
+                } else {
+                    console.log("用户授权");
+                    this.getCode();
+                }
+            }
         },
         methods: {
             //获取微信code
@@ -310,12 +327,12 @@
     }
     window.onload = function () {
         music_mp3 = document.getElementById('musicfx');
-        setTimeout(function () {
-            $('.myscroll').vTicker({
-                showItems: 3,
-                animation: 'fade'
-            }), 3000
-        });
+        // setTimeout(function () {
+        //     $('.myscroll').vTicker({
+        //         showItems: 3,
+        //         animation: 'fade'
+        //     }), 5000
+        // });
         //播放音乐
         setTimeout(function () {
             just_play(), 2000
@@ -369,13 +386,12 @@
         if (ua.match(/MicroMessenger/i) == "micromessenger") {
             return true;
         } else {
-            return true;
-            // return false;
+            // return true;
+            return false;
         }
     }
 </script>
 
-<script src="https://cdn.bootcss.com/jquery-weui/1.2.1/js/jquery-weui.min.js"></script>
 <!-- 如果使用了某些拓展插件还需要额外的JS -->
 <script src="https://cdn.bootcss.com/jquery-weui/1.2.1/js/swiper.min.js"></script>
 
