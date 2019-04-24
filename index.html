@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="https://cdn.bootcss.com/weui/1.1.3/style/weui.min.css">
     <link rel="stylesheet" href="https://cdn.bootcss.com/jquery-weui/1.2.1/css/jquery-weui.min.css">
     <link rel="stylesheet" href="./css/music.css">
+    <link rel="stylesheet" href="./css/nav.css">
+    <link rel="stylesheet" type="text/css" href="http://www.jq22.com/jquery/font-awesome.4.6.0.css">
     <style>
         .placeholder {
             margin: 5px;
@@ -104,7 +106,6 @@
                                 </li>
                             </ul>
                         </vue-seamless-scroll>
-
                         <!-- </div> -->
                     </div>
 
@@ -115,7 +116,7 @@
         <div class="weui-flex">
             <div class="weui-flex__item">
                 <div class="placeholder" style="text-align: center;">活动佣金排行榜
-                    <div class="weui-panel weui-panel_access">
+                    <div class="weui-panel weui-panel_access" style="height:200px">
                         <!-- <div class="myscroll"> -->
                         <vue-seamless-scroll :data="activity.reward_list" :class-option="classOption">
                             <ul style="width:100%;min-width:100%;">
@@ -133,6 +134,17 @@
             </div>
         </div>
         <img :src="activity.goodsDetail" width="100%" />
+        <div class="weui-flex" v-show="isManager">
+            <div class="weui-flex__item">
+                <div class="placeholder" style="text-align: center;">
+                    <a :href="`${remote_url}/store_manage.html?i=${goodsId}&uid=${userId}`" style="text-align:center">商家核销</a>
+                </div>
+                <br>
+            </div>
+        </div>
+        <div class="weui-footer">
+            <p class="weui-footer__text">Copyright © 2018-2020 geyl</p>
+        </div>
         <div v-show="!activity.isEnd"
             style="overflow:hidden; position: fixed;bottom: 0;width: 100%;z-index: 10;text-align: center">
             <a href="javascript:;"
@@ -142,7 +154,7 @@
                 style="background:rgba(20, 180, 68, 0.877);width: 49%;height: 30px;line-height:30px;display: inline-block;"
                 class="open-popup" data-target="#formAdd">分享赚赏金</a>
         </div>
-
+        <!-- 用户下单 -->
         <div id="formAdd" class="weui-popup__container popup-bottom">
             <div class="weui-popup__overlay"></div>
             <div class="weui-popup__modal">
@@ -163,24 +175,41 @@
                 </div>
             </div>
         </div>
+        <!-- 音乐播放 -->
         <span id="musicControl">
             <a id="mc_play" class="on" onclick="play_music();">
                 <audio id="musicfx" loop="loop" autoplay="autoplay" preload="auto" :src="activity.activityMusic">
                 </audio>
             </a>
         </span>
-
+        <!-- 悬浮按钮 -->
+        <div class="leftNav-item">
+            <ul>
+                <li title="业务合作">
+                    <i class="fa fa-comments"></i>
+                    <a :href="`${remote_url}/store_add.html`" class="rota">业务合作</a>
+                </li>
+                <li title="在线客服">
+                    <i class="fa fa-phone"></i>
+                    <a v-bind:href="`tel:${activity.storePhone}`" class="rota">联系商家</a>
+                </li>
+                <li title="返回顶部" class="for-top">
+                    <i class="fa fa-arrow-up"></i>
+                    <a href="javascript:;" class="rota">去顶部</a>
+                </li>
+            </ul>
+        </div>
     </div>
-
 </body>
 <script src="https://cdn.bootcss.com/jquery/1.11.0/jquery.min.js"></script>
 <!-- <script src="./js/jquery.vticker.min.js"></script> -->
 <script src="https://cdn.bootcss.com/vue/2.5.9/vue.js"></script>
 <script src="https://cdn.bootcss.com/axios/0.19.0-beta.1/axios.min.js"></script>
 <script src="./js/vue-seamless-scroll.min.js"></script>
+<script src="./js/nav.js"></script>
 <script src="https://cdn.bootcss.com/jquery-weui/1.2.1/js/jquery-weui.min.js"></script>
 <script>
-    var remote_url = "http://57e09ac7.ngrok.io";
+    var remote_url = "http://6c84683b.ngrok.io";
     // var remote_url = "http://127.0.0.1:8080";
     var pid = getQueryString('pid');
     var goodsId = getQueryString('i');
@@ -189,10 +218,12 @@
     var vm = new Vue({
         el: '#app',
         data: {
-            isOpen: true,
-            userId: 1,
-            isOrder: 0,
-            animate: false,
+            remote_url: remote_url,
+            isOpen: true,//默认false
+            userId: 2,
+            isOrder: false,
+            isManager: true,
+            goodsId: goodsId,
             activity: {
                 scanNumber: 0,
                 joinNumber: 0,
@@ -204,6 +235,7 @@
                 activityMusic: '',
                 endTime: '',
                 storeName: '',
+                storePhone: '',
                 scan_user: [
                     // { nickName: '李四', avatar: 'http://ppqnam2qx.bkt.clouddn.com/FvG41YMFLOr5OffW_h8IepTFk173' },
                 ],
@@ -224,19 +256,23 @@
             }
         },
         created() {
-            // this.getActivityGoods(goodsId);
-            if (!isWeiXin()) {
-                $.alert("请在微信打开");
-            } else {
-                if (code != null) {
-                    this.isOpen = true;
-                    this.createUser(code);
-                    this.getActivityGoods(goodsId);
-                } else {
-                    console.log("用户授权");
-                    this.getCode();
-                }
-            }
+            this.getActivityGoods(goodsId);
+            // if (!isWeiXin()) {
+            //     $.alert("请在微信打开");
+            // } else {
+            //     if (goodsId != null && goodsId != '') {
+            //         if (code != null) {
+            //             this.isOpen = true;
+            //             this.createUser(code);
+            //             this.getActivityGoods(goodsId);
+            //         } else {
+            //             console.log("用户授权");
+            //             this.getCode();
+            //         }
+            //     }else{
+            //         $.alert("网址有误");
+            //     }
+            // }
         },
         methods: {
             //获取微信code
@@ -277,6 +313,7 @@
                     .then(function (response) {
                         temp.userId = response.data.data.userId;
                         temp.isOrder = response.data.data.isOrder;
+                        temp.isManager = response.data.data.isManager;
                         console.log(response.data);
                     })
                     .catch(function (error) {
