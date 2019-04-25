@@ -154,8 +154,9 @@
         }
     });
     function getSign() {
-        let url = 'url=http%3a%2f%2f6c84683b.ngrok.io%2fstore_manage.html%3fi%3d2%26uid%3d2';
-        axios.post(remote_url + '/h5/activity/getSign', url)
+        var url = window.location.href;
+        let param = 'url=' + encodeURI(url);
+        axios.post(remote_url + '/h5/activity/getSign', param)
             .then(function (response) {
                 console.log(response.data);
                 if (response.data.code === 200) {
@@ -200,7 +201,10 @@
             });
         });
     }
-    function orderClose(code) {
+    /**
+    *核销码查询
+    */
+    function orderCodeCheck(code) {
         if (code == null || code == '') {
             code = $("#orderCode").val();
         }
@@ -208,6 +212,32 @@
             $.alert("请输入核销码");
             return;
         }
+        axios.get(remote_url + '/h5/activity/order/'+code)
+            .then(function (response) {
+                console.log(response.data);
+                if (response.data.code === 200) {
+                    $.confirm({
+                        title: '确认核销',
+                        text: '用户姓名:' + response.data.data.userName + ',用户手机号:' + response.data.data.phone,
+                        onOK: function () {
+                            orderClose(code);
+                        },
+                        onCancel: function () {
+                        }
+                    });
+
+                } else {
+                    $.alert(response.data.msg);
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+    /**
+    *核销
+    */
+    function orderClose(code) {
         let order = 'userId=' + userId + '&orderCode=' + code;
         axios.post(remote_url + '/h5/activity/order/close', order)
             .then(function (response) {

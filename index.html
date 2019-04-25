@@ -137,7 +137,8 @@
         <div class="weui-flex" v-show="isManager">
             <div class="weui-flex__item">
                 <div class="placeholder" style="text-align: center;">
-                    <a :href="`${remote_url}/store_manage.html?i=${goodsId}&uid=${userId}`" style="text-align:center">商家核销</a>
+                    <a :href="`${remote_url}/store_manage.html?i=${goodsId}&uid=${userId}`"
+                        style="text-align:center">商家核销</a>
                 </div>
                 <br>
             </div>
@@ -215,6 +216,7 @@
     var goodsId = getQueryString('i');
     var code = getQueryString('code');
     var music_mp3;
+    var post_flag = false;
     var vm = new Vue({
         el: '#app',
         data: {
@@ -330,7 +332,17 @@
                     "openid": "",
                     "pUserId": pid,
                 }
+                if(order.phone==''||order.phone==null){
+                    $.alert("请填写手机号");
+                    return;
+                }
+                if(order.userName==''||order.userName==null){
+                    $.alert("请填写姓名");
+                    return;
+                }
                 console.log(order);
+                if (post_flag) return; //如果正在提交则直接返回，停止执行
+                post_flag = true;//标记当前状态为正在提交状态
                 axios.post(remote_url + '/h5/activity/order/add', order)
                     .then(function (response) {
                         console.log(response.data);
@@ -338,11 +350,7 @@
                     .catch(function (error) {
                         console.log(error);
                     });
-            },
-            timeout1: function (ms) {
-                return new Promise(resolve => {
-                    setTimeout(resolve, ms);
-                })
+                post_flag = false; //如果正在提交则直接返回，停止执行
             },
         }
     });
