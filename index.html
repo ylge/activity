@@ -234,8 +234,8 @@
 <script src="./js/jquery.qrcode.min.js"></script>
 <script src="https://cdn.bootcss.com/jquery-weui/1.2.1/js/jquery-weui.min.js"></script>
 <script>
-    // var remote_url = "http://6c84683b.ngrok.io";
-    var remote_url = "http://127.0.0.1:8080";
+    var remote_url = "http://115.29.65.129:8080/activity/";
+    // var remote_url = "http://127.0.0.1:8080";
     var pid = getQueryString('pid');
     var goodsId = getQueryString('i');
     var code = getQueryString('code');
@@ -245,12 +245,12 @@
         el: '#app',
         data: {
             remote_url: remote_url,
-            isOpen: true,//默认false
-            userId: 2,
-            isOrder: true,
-            isManager: true,
+            isOpen: false,
+            userId: '',
+            isOrder: false,
+            isManager: false,
             goodsId: goodsId,
-            orderCode: '1231231',
+            orderCode: '',
             activity: {
                 scanNumber: 0,
                 joinNumber: 0,
@@ -274,36 +274,28 @@
                 ]
             }
         },
-        computed: {
-            classOption: function () {
-                return {
-                    step: 0.5,
-                    limitMoveNum: 3
+        created() {
+            // this.getActivityGoods(goodsId);
+            // console.log(this.isOrder);
+            if (!isWeiXin()) {
+                $.alert("请在微信打开");
+            } else {
+                if (goodsId != null && goodsId != '') {
+                    if (code != null) {
+                        this.isOpen = true;
+                        this.createUser(code);
+                        this.getActivityGoods(goodsId);
+                    } else {
+                        console.log("用户授权");
+                        this.getCode();
+                    }
+                }else{
+                    $.alert("网址有误");
                 }
             }
-        },
-        created() {
-            this.getActivityGoods(goodsId);
-            console.log(this.isOrder);
             if (this.isOrder) {
                 $('#qrcode').qrcode({ render: "table", height: 400, width: 400, correctLevel: 0, text: this.orderCode });
             }
-            // if (!isWeiXin()) {
-            //     $.alert("请在微信打开");
-            // } else {
-            //     if (goodsId != null && goodsId != '') {
-            //         if (code != null) {
-            //             this.isOpen = true;
-            //             this.createUser(code);
-            //             this.getActivityGoods(goodsId);
-            //         } else {
-            //             console.log("用户授权");
-            //             this.getCode();
-            //         }
-            //     }else{
-            //         $.alert("网址有误");
-            //     }
-            // }
         },
         methods: {
             //获取微信code

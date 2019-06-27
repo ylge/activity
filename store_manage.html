@@ -73,12 +73,10 @@
                             </div>
                         </div>
                     </div>
-                    <div id="tab3" class="weui-tab__bd-item">
-
+                    <!-- <div id="tab3" class="weui-tab__bd-item">
                         <div class="weui-flex">
                             <div class="weui-flex__item"><input class="weui-input" type="text" name="phone"
                                     placeholder="手机号查询"></div>
-                            <!-- <div class="weui-flex__item"></div> -->
                             <a href="javascript:;" class="weui-btn weui-btn_primary">查询</a>
                         </div>
 
@@ -95,7 +93,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>
@@ -108,8 +106,8 @@
 <script src="https://cdn.bootcss.com/axios/0.19.0-beta.1/axios.min.js"></script>
 <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
 <script>
-    // var remote_url = "http://192.168.137.1:8080";
-    var remote_url = "http://6c84683b.ngrok.io";
+    // var remote_url = "http://127.0.0.1:8080";
+    var remote_url = "http://115.29.65.129:8080";
     var goodsId = getQueryString('i');
     var userId = getQueryString('uid');
     var vm = new Vue({
@@ -212,7 +210,7 @@
             $.alert("请输入核销码");
             return;
         }
-        axios.get(remote_url + '/h5/activity/order/'+code)
+        axios.get(remote_url + '/h5/activity/order/' + code)
             .then(function (response) {
                 console.log(response.data);
                 if (response.data.code === 200) {
@@ -255,8 +253,6 @@
     /**
             * 获取url参数
             * @param name
-            * @returns {null}
-            * @constructor
             */
     function getQueryString(name) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");

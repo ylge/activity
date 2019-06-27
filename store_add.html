@@ -45,8 +45,8 @@
 </body>
 <script src="https://cdn.bootcss.com/jquery/1.11.0/jquery.min.js"></script>
 <script>
-    // var remote_url = "http://dd1079eb.ngrok.io";
-    var remote_url = "http://127.0.0.1:8080";
+    var remote_url = "http://115.29.65.129:8080";
+    // var remote_url = "http://127.0.0.1:8080";
     function storeAdd() {
         var userName = $("#userName").val();
         if (userName == '') {
@@ -69,6 +69,8 @@
                             history.go(-1);
                         }
                     });
+                }else{
+                    $.alert("系统错误");
                 }
             }
         );
