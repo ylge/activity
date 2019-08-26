@@ -137,7 +137,7 @@
         <div class="weui-flex" v-show="isManager">
             <div class="weui-flex__item">
                 <div class="placeholder" style="text-align: center;">
-                    <a :href="`${remote_url}/store_manage.html?i=${goodsId}&uid=${userId}`"
+                    <a :href="`${target_url}/store_manage.html?i=${goodsId}&uid=${userId}`"
                         style="text-align:center">商家核销</a>
                 </div>
                 <br>
@@ -211,7 +211,7 @@
             <ul>
                 <li title="业务合作">
                     <i class="fa fa-comments"></i>
-                    <a :href="`${remote_url}/store_add.html`" class="rota">业务合作</a>
+                    <a :href="`${target_url}store_add.html`" class="rota">业务合作</a>
                 </li>
                 <li title="在线客服">
                     <i class="fa fa-phone"></i>
@@ -234,7 +234,8 @@
 <script src="./js/jquery.qrcode.min.js"></script>
 <script src="https://cdn.bootcss.com/jquery-weui/1.2.1/js/jquery-weui.min.js"></script>
 <script>
-    var remote_url = "http://115.29.65.129:8080/activity/";
+    var remote_url = "http://www.hebiysg.cn/activity/";
+    var target_url = "http://www.hebiysg.cn/marketing/";
     // var remote_url = "http://127.0.0.1:8080";
     var pid = getQueryString('pid');
     var goodsId = getQueryString('i');
@@ -452,7 +453,7 @@
             return true;
         } else {
             // return true;
-            return false;
+            return true;
         }
     }
     
