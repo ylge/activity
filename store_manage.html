@@ -151,12 +151,13 @@
             }
         }
     });
+
     function getSign() {
-        var url = window.location.href.split('?')[0];
-        let param = 'url=' + encodeURI(url);
-        axios.post(remote_url + '/h5/activity/getSign', param)
+        var url = window.location.href;
+        axios.post(remote_url + '/h5/activity/getSign', {'url':url})
             .then(function (response) {
                 if (response.data.code === 200) {
+                    console.log(response.data.data);
                     var appId = response.data.data.appId;
                     var nonceStr = response.data.data.nonceStr;
                     var timestamp = response.data.data.timestamp;
@@ -199,8 +200,8 @@
         });
     }
     /**
-    *核销码查询
-    */
+     *核销码查询
+     */
     function orderCodeCheck(code) {
         if (code == null || code == '') {
             code = $("#orderCode").val();
@@ -219,8 +220,7 @@
                         onOK: function () {
                             orderClose(code);
                         },
-                        onCancel: function () {
-                        }
+                        onCancel: function () {}
                     });
 
                 } else {
@@ -232,8 +232,8 @@
             });
     }
     /**
-    *核销
-    */
+     *核销
+     */
     function orderClose(code) {
         let order = 'userId=' + userId + '&orderCode=' + code;
         axios.post(remote_url + '/h5/activity/order/close', order)
@@ -250,9 +250,9 @@
             });
     }
     /**
-            * 获取url参数
-            * @param name
-            */
+     * 获取url参数
+     * @param name
+     */
     function getQueryString(name) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
         var r = window.location.search.substr(1).match(reg);
