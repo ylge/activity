@@ -100,13 +100,12 @@
     </div>
 
 </body>
-<script src="https://cdn.css.net/libs/vue/2.0.3/vue.js"></script>
+<script src="https://cdn.bootcss.com/vue/2.5.9/vue.js"></script>
 <script src="./js/vue-infinite-scroll.js"></script>
-<script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
 <script src="https://cdn.bootcss.com/axios/0.19.0-beta.1/axios.min.js"></script>
-<script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
 <script>
-    // var remote_url = "http://127.0.0.1:8080";
+    // var remote_url = "http://127.0.0.1:8080/activity/";
     var remote_url = "http://www.hebiysg.cn/activity/";
     var goodsId = getQueryString('i');
     var userId = getQueryString('uid');
@@ -114,6 +113,7 @@
         el: '#app',
         data: {
             activity: {
+                remote_url: remote_url,
                 scanNumber: 0,
                 joinNumber: 0,
                 storeIncome: 0,
@@ -152,11 +152,10 @@
         }
     });
     function getSign() {
-        var url = window.location.href;
+        var url = window.location.href.split('?')[0];
         let param = 'url=' + encodeURI(url);
         axios.post(remote_url + '/h5/activity/getSign', param)
             .then(function (response) {
-                console.log(response.data);
                 if (response.data.code === 200) {
                     var appId = response.data.data.appId;
                     var nonceStr = response.data.data.nonceStr;

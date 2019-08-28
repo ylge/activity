@@ -137,14 +137,14 @@
         <div class="weui-flex" v-show="isManager">
             <div class="weui-flex__item">
                 <div class="placeholder" style="text-align: center;">
-                    <a :href="`${target_url}/store_manage.html?i=${goodsId}&uid=${userId}`"
+                    <a v-if="target_url" :href="`${target_url}/store_manage.html?i=${goodsId}&uid=${userId}`"
                         style="text-align:center">商家核销</a>
                 </div>
                 <br>
             </div>
         </div>
         <div class="weui-footer">
-            <p class="weui-footer__text">Copyright © 2018-2020 geyl</p>
+            <!-- <p class="weui-footer__text">Copyright © 2018-2020 geyl</p> -->
         </div>
         <div v-show="!activity.isEnd"
             style="overflow:hidden; position: fixed;bottom: 0;width: 100%;z-index: 10;text-align: center">
@@ -211,11 +211,11 @@
             <ul>
                 <li title="业务合作">
                     <i class="fa fa-comments"></i>
-                    <a :href="`${target_url}store_add.html`" class="rota">业务合作</a>
+                    <a v-if="target_url" v-bind:href="`${target_url}/store_add.html`" class="rota">业务合作</a>
                 </li>
                 <li title="在线客服">
                     <i class="fa fa-phone"></i>
-                    <a v-bind:href="`tel:${activity.storePhone}`" class="rota">联系商家</a>
+                    <a v-if="target_url" v-bind:href="`tel:${activity.storePhone}`" class="rota">联系商家</a>
                 </li>
                 <li title="返回顶部" class="for-top">
                     <i class="fa fa-arrow-up"></i>
@@ -229,14 +229,15 @@
 <!-- <script src="./js/jquery.vticker.min.js"></script> -->
 <script src="https://cdn.bootcss.com/vue/2.5.9/vue.js"></script>
 <script src="https://cdn.bootcss.com/axios/0.19.0-beta.1/axios.min.js"></script>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
 <script src="./js/vue-seamless-scroll.min.js"></script>
 <script src="./js/nav.js"></script>
 <script src="./js/jquery.qrcode.min.js"></script>
 <script src="https://cdn.bootcss.com/jquery-weui/1.2.1/js/jquery-weui.min.js"></script>
 <script>
     var remote_url = "http://www.hebiysg.cn/activity/";
-    var target_url = "http://www.hebiysg.cn/marketing/";
-    // var remote_url = "http://127.0.0.1:8080";
+    var target_url = "http://www.hebiysg.cn/marketing";
+    // var remote_url = "http://127.0.0.1:8080/activity/";
     var pid = getQueryString('pid');
     var goodsId = getQueryString('i');
     var code = getQueryString('code');
@@ -246,8 +247,10 @@
         el: '#app',
         data: {
             remote_url: remote_url,
+            target_url: target_url,
             isOpen: false,
             userId: '',
+            openid: '',
             isOrder: false,
             isManager: false,
             goodsId: goodsId,
@@ -276,8 +279,8 @@
             }
         },
         created() {
+            // this.isOpen = true;
             // this.getActivityGoods(goodsId);
-            // console.log(this.isOrder);
             if (!isWeiXin()) {
                 $.alert("请在微信打开");
             } else {
@@ -295,14 +298,20 @@
                 }
             }
             if (this.isOrder) {
-                $('#qrcode').qrcode({ render: "table", height: 400, width: 400, correctLevel: 0, text: this.orderCode });
+                $('#qrcode').qrcode({
+                    render: "table",
+                    height: 400,
+                    width: 400,
+                    correctLevel: 0,
+                    text: this.orderCode
+                });
             }
         },
         methods: {
             //获取微信code
             getCode: function () {
-                axios.get(remote_url + '/h5/activity/getCode/' + goodsId + '/null').then(function (response) {
-                    console.log(response.data);
+                axios.get(remote_url + '/h5/activity/getCode/' + goodsId + '/null').then(function (
+                    response) {
                     window.open(response.data.data);
                 }).catch(function (error) {
                     console.log(error);
@@ -322,7 +331,8 @@
                             $.alert("该活动已结束");
                         } else {
                             var endDate = temp.activity.endTime.split("-");
-                            setInterval("Timer(" + endDate[0] + "," + endDate[1] + "," + endDate[2] + ",00,00,00)", 1000);
+                            setInterval("Timer(" + endDate[0] + "," + endDate[1] + "," + endDate[2] +
+                                ",00,00,00)", 1000);
                         }
                     })
                     .catch(function (error) {
@@ -336,9 +346,9 @@
                 axios.post(remote_url + '/h5/activity/user/add', userCode)
                     .then(function (response) {
                         temp.userId = response.data.data.userId;
-                        temp.isOrder = response.data.data.isOrder;
-                        temp.isManager = response.data.data.isManager;
-                        console.log(response.data);
+                        temp.openid = response.data.data.openid;
+                        temp.isOrder = response.data.data.order;
+                        temp.isManager = response.data.data.manager;
                     })
                     .catch(function (error) {
                         console.log(error);
@@ -351,7 +361,7 @@
                     "phone": this.$refs.userPhone.value,
                     "userId": this.userId,
                     "userName": this.$refs.userName.value,
-                    "openid": "",
+                    "openid": this.openid,
                     "pUserId": pid,
                 }
                 if (order.phone == '' || order.phone == null) {
@@ -362,12 +372,20 @@
                     $.alert("请填写姓名");
                     return;
                 }
-                console.log(order);
                 if (post_flag) return; //如果正在提交则直接返回，停止执行
-                post_flag = true;//标记当前状态为正在提交状态
+                post_flag = true; //标记当前状态为正在提交状态
                 axios.post(remote_url + '/h5/activity/order/add', order)
                     .then(function (response) {
-                        console.log(response.data);
+                        if (typeof WeixinJSBridge == "undefined") {
+                            if (document.addEventListener) {
+                                document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
+                            } else if (document.attachEvent) {
+                                document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
+                                document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
+                            }
+                        } else {
+                            onBridgeReady(response.data.data);;
+                        }
                     })
                     .catch(function (error) {
                         console.log(error);
@@ -376,6 +394,26 @@
             },
         }
     });
+
+    function onBridgeReady(params) {
+        WeixinJSBridge.invoke(
+            'getBrandWCPayRequest', {
+                "appId": params.appId, //公众号名称，由商户传入     
+                "timeStamp": params.timeStamp, //时间戳，自1970年以来的秒数     
+                "nonceStr": params.nonceStr, //随机串     
+                "package": params.package,
+                "signType": "MD5", //微信签名方式：     
+                "paySign": params.paySign //微信签名 
+            },
+            function (res) {
+                if (res.err_msg == "get_brand_wcpay_request:ok") {
+                    // 使用以上方式判断前端返回,微信团队郑重提示：
+                    //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
+                    $.alert("支付成功");
+                }
+            });
+    }
+
     /**
      * 播放音乐
      */
@@ -388,19 +426,13 @@
             $('#mc_play').attr('class', 'on');
         }
     }
+
     function just_play() {
         music_mp3.play();
         $('#mc_play').attr('class', 'on');
     }
     window.onload = function () {
         music_mp3 = document.getElementById('musicfx');
-        // setTimeout(function () {
-        //     $('.myscroll').vTicker({
-        //         showItems: 3,
-        //         animation: 'fade'
-        //     }), 5000
-        // });
-        //播放音乐
         setTimeout(function () {
             just_play(), 2000
         });
@@ -413,19 +445,21 @@
         var leftTime = (new Date(year, month - 1, day, hour, minute, second)) - (new Date()); //计算剩余的毫秒数 
         var days = parseInt(leftTime / 1000 / 60 / 60 / 24, 10); //计算剩余的天数 
         var hours = parseInt(leftTime / 1000 / 60 / 60 % 24, 10); //计算剩余的小时 
-        var minutes = parseInt(leftTime / 1000 / 60 % 60, 10);//计算剩余的分钟 
-        var seconds = parseInt(leftTime / 1000 % 60, 10);//计算剩余的秒数 
+        var minutes = parseInt(leftTime / 1000 / 60 % 60, 10); //计算剩余的分钟 
+        var seconds = parseInt(leftTime / 1000 % 60, 10); //计算剩余的秒数 
         days = checkTime(days);
         hours = checkTime(hours);
         minutes = checkTime(minutes);
         seconds = checkTime(seconds);
 
-        if (isNaN(days)) { }
-        else {
-            document.getElementById("timer").innerHTML = "<h3>" + '<span style="color:red">' + days + '</span> ' + "天 " + '<span style="color:red">' + hours + '</span> ' + "小时 " + '<span style="color:red">' + minutes + '</span> ' + "分 " + '<span style="color:red">' + seconds + '</span> ' + "秒" + "</h3>";
+        if (isNaN(days)) {} else {
+            document.getElementById("timer").innerHTML = "<h3>" + '<span style="color:red">' + days + '</span> ' +
+                "天 " + '<span style="color:red">' + hours + '</span> ' + "小时 " + '<span style="color:red">' + minutes +
+                '</span> ' + "分 " + '<span style="color:red">' + seconds + '</span> ' + "秒" + "</h3>";
         }
 
     }
+
     function checkTime(i) { //将0-9的数字前面加上0，例1变为01 
         if (i < 10) {
             i = "0" + i;
@@ -434,11 +468,11 @@
     }
 
     /**
-        * 获取url参数
-        * @param name
-        * @returns {null}
-        * @constructor
-        */
+     * 获取url参数
+     * @param name
+     * @returns {null}
+     * @constructor
+     */
     function getQueryString(name) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
         var r = window.location.search.substr(1).match(reg);
@@ -456,7 +490,6 @@
             return true;
         }
     }
-    
 </script>
 
 <!-- 如果使用了某些拓展插件还需要额外的JS -->
