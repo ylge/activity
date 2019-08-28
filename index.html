@@ -141,6 +141,8 @@
                         style="text-align:center">商家核销</a>
                 </div>
                 <br>
+                <br>
+                <br>
             </div>
         </div>
         <div class="weui-footer">
@@ -164,7 +166,8 @@
                 <div class="weui-flex__item">
                     <a href="javascript:;"
                         style="background:rgba(20, 180, 68, 0.877);width: 100%;height: 40px;line-height:40px;"
-                        class="weui-btn weui-btn_plain-default open-popup" data-target="#share">分享赚赏金</a>
+                        class="weui-btn weui-btn_plain-default open-popup" onclick="shareFirend()"
+                        data-target="#share">分享赚赏金</a>
                 </div>
             </div>
 
@@ -194,9 +197,10 @@
         <!-- 我的兑换码 -->
         <div id="orderCode" class="weui-popup__container popup-bottom">
             <div class="weui-popup__overlay"></div>
-            <div class="weui-popup__modal">
-                <div id="qrcode">
-                </div>
+            <div class="weui-popup__modal" style="padding: 20px">
+                <h3>兑换码:{{orderCode}}<h3>
+                        <div id="qrcode">
+                        </div>
             </div>
         </div>
         <!-- 音乐播放 -->
@@ -216,10 +220,6 @@
                 <li title="在线客服">
                     <i class="fa fa-phone"></i>
                     <a v-if="target_url" v-bind:href="`tel:${activity.storePhone}`" class="rota">联系商家</a>
-                </li>
-                <li title="返回顶部" class="for-top">
-                    <i class="fa fa-arrow-up"></i>
-                    <a href="javascript:;" class="rota">去顶部</a>
                 </li>
             </ul>
         </div>
@@ -251,7 +251,7 @@
             isOpen: false,
             userId: '',
             openid: '',
-            isOrder: false,
+            isOrder: true,
             isManager: false,
             goodsId: goodsId,
             orderCode: '',
@@ -261,6 +261,7 @@
                 status: 1,
                 isEnd: false,
                 goodsImage: '',
+                goodsName: '',
                 goodsDetail: '',
                 backgroundImage: '',
                 activityMusic: '',
@@ -293,18 +294,9 @@
                         console.log("用户授权");
                         this.getCode();
                     }
-                }else{
+                } else {
                     $.alert("网址有误");
                 }
-            }
-            if (this.isOrder) {
-                $('#qrcode').qrcode({
-                    render: "table",
-                    height: 400,
-                    width: 400,
-                    correctLevel: 0,
-                    text: this.orderCode
-                });
             }
         },
         methods: {
@@ -334,6 +326,7 @@
                             setInterval("Timer(" + endDate[0] + "," + endDate[1] + "," + endDate[2] +
                                 ",00,00,00)", 1000);
                         }
+                        temp.getSign();
                     })
                     .catch(function (error) {
                         console.log(error);
@@ -349,6 +342,16 @@
                         temp.openid = response.data.data.openid;
                         temp.isOrder = response.data.data.order;
                         temp.isManager = response.data.data.manager;
+                        if (response.data.data.order) {
+                            temp.orderCode = response.data.data.orderCode;
+                            $('#qrcode').qrcode({
+                                render: "table",
+                                height: 350,
+                                width: 350,
+                                correctLevel: 0,
+                                text: response.data.data.orderCode
+                            });
+                        }
                     })
                     .catch(function (error) {
                         console.log(error);
@@ -392,6 +395,55 @@
                     });
                 post_flag = false; //如果正在提交则直接返回，停止执行
             },
+            getSign: function () {
+                var temp = this;
+                var url = window.location.href;
+                axios.post(remote_url + '/h5/activity/getSign', {
+                        'url': url
+                    })
+                    .then(function (response) {
+                        if (response.data.code === 200) {
+                            console.log(response.data.data);
+                            var appId = response.data.data.appId;
+                            var nonceStr = response.data.data.nonceStr;
+                            var timestamp = response.data.data.timestamp;
+                            var signature = response.data.data.signature;
+                            wx.config({
+                                debug: false,
+                                appId: appId,
+                                timestamp: timestamp,
+                                nonceStr: nonceStr,
+                                signature: signature,
+                                jsApiList: [
+                                    'checkJsApi',
+                                    'chooseImage',
+                                    'scanQRCode',
+                                    'updateAppMessageShareData',
+                                    'updateTimelineShareData',
+                                ]
+                            });
+                            var shareData = {
+                                "title": temp.activity.goodsName, // 分享标题
+                                "desc": '赶紧来参加活动哦！',
+                                "link": window.location.href + "&pid="+temp.userId,
+                                "imgUrl": temp.activity.goodsImage,
+                                success: function (res) {
+                                    // alert(res)
+                                }
+                            };
+                            wx.ready(function () {
+                                $.alert(shareData);
+                                wx.updateAppMessageShareData(shareData);
+                                wx.updateTimelineShareData(shareData);
+                            });
+                        } else {
+                            $.alert(response.data.msg);
+                        }
+                    })
+                    .catch(function (error) {
+                        $.alert("网络错误"+error);
+                    });
+            }
         }
     });
 
@@ -431,12 +483,12 @@
         music_mp3.play();
         $('#mc_play').attr('class', 'on');
     }
+
     window.onload = function () {
         music_mp3 = document.getElementById('musicfx');
         setTimeout(function () {
             just_play(), 2000
         });
-
     }
 
     //倒计时
@@ -454,7 +506,8 @@
 
         if (isNaN(days)) {} else {
             document.getElementById("timer").innerHTML = "<h3>" + '<span style="color:red">' + days + '</span> ' +
-                "天 " + '<span style="color:red">' + hours + '</span> ' + "小时 " + '<span style="color:red">' + minutes +
+                "天 " + '<span style="color:red">' + hours + '</span> ' + "小时 " + '<span style="color:red">' +
+                minutes +
                 '</span> ' + "分 " + '<span style="color:red">' + seconds + '</span> ' + "秒" + "</h3>";
         }
 

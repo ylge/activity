@@ -1,7 +1,7 @@
 .leftNav-item {
 	position: fixed;
 	left: 5px;
-	top: 60%;
+	top: 50%;
 	z-index: 999999;
 }
 .leftNav-item ul{
