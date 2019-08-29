@@ -166,8 +166,7 @@
                 <div class="weui-flex__item">
                     <a href="javascript:;"
                         style="background:rgba(20, 180, 68, 0.877);width: 100%;height: 40px;line-height:40px;"
-                        class="weui-btn weui-btn_plain-default open-popup" onclick="shareFirend()"
-                        data-target="#share">分享赚赏金</a>
+                        class="weui-btn weui-btn_plain-default open-popup" data-target="#share">分享赚赏金</a>
                 </div>
             </div>
 
@@ -285,13 +284,14 @@
             if (!isWeiXin()) {
                 $.alert("请在微信打开");
             } else {
+                if (pid != null && pid != '') {
+                    window.sessionStorage.setItem('pid', pid);
+                }
                 if (goodsId != null && goodsId != '') {
                     if (code != null) {
                         this.isOpen = true;
                         this.createUser(code);
-                        this.getActivityGoods(goodsId);
                     } else {
-                        console.log("用户授权");
                         this.getCode();
                     }
                 } else {
@@ -302,7 +302,7 @@
         methods: {
             //获取微信code
             getCode: function () {
-                axios.get(remote_url + '/h5/activity/getCode/' + goodsId + '/null').then(function (
+                axios.get(remote_url + '/h5/activity/getCode/' + goodsId + '/' + pid).then(function (
                     response) {
                     window.open(response.data.data);
                 }).catch(function (error) {
@@ -338,6 +338,7 @@
                 let userCode = 'goodsId=' + goodsId + '&code=' + code;
                 axios.post(remote_url + '/h5/activity/user/add', userCode)
                     .then(function (response) {
+                        temp.getActivityGoods(goodsId);
                         temp.userId = response.data.data.userId;
                         temp.openid = response.data.data.openid;
                         temp.isOrder = response.data.data.order;
@@ -365,7 +366,7 @@
                     "userId": this.userId,
                     "userName": this.$refs.userName.value,
                     "openid": this.openid,
-                    "pUserId": pid,
+                    "parentId": window.sessionStorage.getItem('pid')
                 }
                 if (order.phone == '' || order.phone == null) {
                     $.alert("请填写手机号");
@@ -425,14 +426,13 @@
                             var shareData = {
                                 "title": temp.activity.goodsName, // 分享标题
                                 "desc": '赶紧来参加活动哦！',
-                                "link": window.location.href + "&pid="+temp.userId,
+                                "link": temp.target_url + "/?i=" + goodsId + "&pid=" + temp.userId,
                                 "imgUrl": temp.activity.goodsImage,
                                 success: function (res) {
                                     // alert(res)
                                 }
                             };
                             wx.ready(function () {
-                                $.alert(shareData);
                                 wx.updateAppMessageShareData(shareData);
                                 wx.updateTimelineShareData(shareData);
                             });
@@ -441,7 +441,7 @@
                         }
                     })
                     .catch(function (error) {
-                        $.alert("网络错误"+error);
+                        $.alert("网络错误" + error);
                     });
             }
         }
@@ -539,8 +539,7 @@
         if (ua.match(/MicroMessenger/i) == "micromessenger") {
             return true;
         } else {
-            // return true;
-            return true;
+            return false;
         }
     }
 </script>
