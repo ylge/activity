@@ -118,12 +118,8 @@
                 joinNumber: 0,
                 storeIncome: 0,
                 storeWithdraw: 0,
-                store_user: [
-                    // { name: '李四', value: '1231' },
-                ],
-                order_list: [
-                    // { userName: '张欢', phone: '13524002701', status: 3, orderCode: 'nx1231231' },
-                ]
+                store_user: [],
+                order_list: []
             }
 
         },
@@ -154,7 +150,9 @@
 
     function getSign() {
         var url = window.location.href;
-        axios.post(remote_url + '/h5/activity/getSign', {'url':url})
+        axios.post(remote_url + '/h5/activity/getSign', {
+                'url': url
+            })
             .then(function (response) {
                 if (response.data.code === 200) {
                     console.log(response.data.data);

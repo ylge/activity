@@ -152,15 +152,17 @@
             style="overflow:hidden; position: fixed;bottom: 0;width: 100%;z-index: 10;text-align: center">
             <div class="weui-flex">
                 <div class="weui-flex__item">
-                    <div v-if="!isOrder">
-                        <a href="javascript:;"
-                            style="background:rgba(20, 180, 68, 0.877);width: 100%;height: 40px;line-height:40px;"
-                            class="weui-btn weui-btn_plain-default open-popup" data-target="#formAdd">点击购买</a>
-                    </div>
-                    <div v-if="isOrder">
-                        <a href="javascript:;"
-                            style="background:rgba(20, 180, 68, 0.877);width: 100%;height: 40px;line-height:40px;"
-                            class="weui-btn weui-btn_plain-default open-popup" data-target="#orderCode">我的兑换码</a>
+                    <div id="leftButton">
+                        <div v-if="!isOrder">
+                            <a href="javascript:;"
+                                style="background:rgba(20, 180, 68, 0.877);width: 100%;height: 40px;line-height:40px;"
+                                class="weui-btn weui-btn_plain-default open-popup" data-target="#formAdd">点击购买</a>
+                        </div>
+                        <div v-if="isOrder">
+                            <a href="javascript:;"
+                                style="background:rgba(20, 180, 68, 0.877);width: 100%;height: 40px;line-height:40px;"
+                                class="weui-btn weui-btn_plain-default open-popup" data-target="#orderCode">我的兑换码</a>
+                        </div>
                     </div>
                 </div>
                 <div class="weui-flex__item">
@@ -250,7 +252,7 @@
             isOpen: false,
             userId: '',
             openid: '',
-            isOrder: true,
+            isOrder: false,
             isManager: false,
             goodsId: goodsId,
             orderCode: '',
@@ -267,20 +269,12 @@
                 endTime: '',
                 storeName: '',
                 storePhone: '',
-                scan_user: [
-                    // { nickName: '李四', avatar: 'http://ppqnam2qx.bkt.clouddn.com/FvG41YMFLOr5OffW_h8IepTFk173' },
-                ],
-                join_user: [
-                    // { userName: '张欢', phone: '13524002701', createTime: '2019-05-01 10:00:00', status: 3, avatar: 'http://ppqnam2qx.bkt.clouddn.com/FvG41YMFLOr5OffW_h8IepTFk173' },
-                ],
-                reward_list: [
-                    // { userName: '张欢', childNum: 4, rewardAmount: 160 }
-                ]
+                scan_user: [],
+                join_user: [],
+                reward_list: []
             }
         },
         created() {
-            // this.isOpen = true;
-            // this.getActivityGoods(goodsId);
             if (!isWeiXin()) {
                 $.alert("请在微信打开");
             } else {
@@ -356,6 +350,7 @@
                     })
                     .catch(function (error) {
                         console.log(error);
+                        $.alert("网络错误");
                     });
             },
             //下单
@@ -390,9 +385,17 @@
                         } else {
                             onBridgeReady(response.data.data);;
                         }
+                        $('#qrcode').qrcode({
+                            render: "table",
+                            height: 350,
+                            width: 350,
+                            correctLevel: 0,
+                            text: response.data.data.orderId
+                        });
                     })
                     .catch(function (error) {
                         console.log(error);
+                        $.alert("网络错误");
                     });
                 post_flag = false; //如果正在提交则直接返回，停止执行
             },
@@ -462,6 +465,11 @@
                     // 使用以上方式判断前端返回,微信团队郑重提示：
                     //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
                     $.alert("支付成功");
+                    $("#leftButton").html(
+                        '<a href="javascript:;"' +
+                        'style="background:rgba(20, 180, 68, 0.877);width: 100%;height: 40px;line-height:40px;"' +
+                        'class="weui-btn weui-btn_plain-default open-popup" data-target="#orderCode">我的兑换码</a>'
+                    );
                 }
             });
     }
