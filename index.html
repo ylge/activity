@@ -161,14 +161,14 @@
                         <div v-if="isOrder">
                             <a href="javascript:;"
                                 style="background:rgba(20, 180, 68, 0.877);width: 100%;height: 40px;line-height:40px;"
-                                class="weui-btn weui-btn_plain-default open-popup" data-target="#orderCode">我的兑换码</a>
+                                class="weui-btn weui-btn_plain-default open-popup" data-target="#orderCode">兑换码</a>
                         </div>
                     </div>
                 </div>
                 <div class="weui-flex__item">
                     <a href="javascript:;"
                         style="background:rgba(20, 180, 68, 0.877);width: 100%;height: 40px;line-height:40px;"
-                        class="weui-btn weui-btn_plain-default open-popup" data-target="#share">分享赚赏金</a>
+                        class="weui-btn weui-btn_plain-default open-popup" data-target="#share">赚赏金</a>
                 </div>
             </div>
 
@@ -282,11 +282,12 @@
                     window.sessionStorage.setItem('pid', pid);
                 }
                 if (goodsId != null && goodsId != '') {
-                    if (code != null) {
-                        this.isOpen = true;
+                    if (code == null) {
+                        this.getCode();
+                    } else if (window.sessionStorage.getItem('userId') == null) {
                         this.createUser(code);
                     } else {
-                        this.getCode();
+                        this.getActivityGoods(goodsId);
                     }
                 } else {
                     $.alert("网址有误");
@@ -311,6 +312,7 @@
                 axios.get(remote_url + '/h5/activity/goods/' + goodsId)
                     .then(function (response) {
                         temp.activity = Object.assign({}, response.data.data);
+                        temp.isOpen = true;
                         document.title = temp.activity.storeName;
                         if (temp.activity.status == 0) {
                             temp.activity.isEnd = true;
@@ -333,6 +335,7 @@
                 axios.post(remote_url + '/h5/activity/user/add', userCode)
                     .then(function (response) {
                         temp.getActivityGoods(goodsId);
+                        window.sessionStorage.setItem('userId', response.data.data.userId);
                         temp.userId = response.data.data.userId;
                         temp.openid = response.data.data.openid;
                         temp.isOrder = response.data.data.order;
