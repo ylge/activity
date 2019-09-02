@@ -43,19 +43,20 @@
         <a href="javascript:;" onclick="storeAdd()" class="weui-btn weui-btn_primary">立即报名</a>
     </div>
 </body>
-<script src="https://cdn.bootcss.com/jquery/1.11.0/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/jquery-weui/1.2.1/js/jquery-weui.min.js"></script>
 <script>
     var remote_url = "http://www.hebiysg.cn/activity/";
     // var remote_url = "http://127.0.0.1:8080";
     function storeAdd() {
         var userName = $("#userName").val();
         if (userName == '') {
-            $.alert("请填写姓名");
+            $.toast("请填写姓名", "text");
             return;
         }
         var phone = $("#phone").val();
         if (phone == '') {
-            $.alert("请填写联系方式");
+            $.toast("请填写联系方式", "text");
             return;
         }
         let param = 'userName=' + userName + '&phone=' + phone;
@@ -69,7 +70,7 @@
                             history.go(-1);
                         }
                     });
-                }else{
+                } else {
                     $.alert("系统错误");
                 }
             }
