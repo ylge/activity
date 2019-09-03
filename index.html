@@ -50,7 +50,7 @@
 
 <body>
     <div v-if="isOpen" id="app" :style="`background:url(${activity.backgroundImage})`">
-        <img :src="activity.goodsImage" width="100%" />
+        <img :src="activity.goodsImage" width="100%" id="goodsImg" />
         <div class="weui-flex">
             <div class="weui-flex__item">
                 <div v-show="!activity.isEnd" class="placeholder" style="text-align: center;">
@@ -221,6 +221,16 @@
                 </li>
             </ul>
         </div>
+        <!-- 二维码 -->
+        <div id="shareQr" style="display:none">
+        </div>
+        <div id="canbox">
+            <canvas id="myCanvas" width="" height=""></canvas>
+        </div>
+        <!-- 合成图片 -->
+        <div style="display: none">
+            <img class="pic" src="" />
+        </div>
     </div>
 </body>
 <!-- <script src="https://cdn.bootcss.com/jquery/1.11.0/jquery.min.js"></script> -->
@@ -232,6 +242,8 @@
 <script src="./js/vue-seamless-scroll.min.js"></script>
 <script src="./js/nav.js"></script>
 <script src="https://cdn.bootcss.com/jquery-weui/1.2.1/js/jquery-weui.min.js"></script>
+<script src="js/canvas2image.js"></script>
+<script src="https://cdn.bootcss.com/html2canvas/0.5.0-beta4/html2canvas.js"></script>
 <script>
     var remote_url = "http://www.hebiysg.cn/activity/";
     var target_url = "http://www.hebiysg.cn/marketing";
@@ -397,6 +409,7 @@
                     });
                 post_flag = false; //如果正在提交则直接返回，停止执行
             },
+            //获取签么
             getSign: function () {
                 var temp = this;
                 var url = window.location.href;
@@ -404,8 +417,9 @@
                         'url': url
                     })
                     .then(function (response) {
+                        //生成分享海报
+                        temp.changeBg();
                         if (response.data.code === 200) {
-                            console.log(response.data.data);
                             var appId = response.data.data.appId;
                             var nonceStr = response.data.data.nonceStr;
                             var timestamp = response.data.data.timestamp;
@@ -444,6 +458,48 @@
                     .catch(function (error) {
                         $.toast("网络错误", "forbidden");
                     });
+            },
+            //加载分享海报
+            changeBg: function () {
+                var that = this;
+                $('#shareQr').qrcode({
+                    height: 350,
+                    width: 350,
+                    correctLevel: 0,
+                    text: target_url + '?i=' + goodsId + '&pid=' + window.sessionStorage.getItem(
+                        'userId')
+                });
+                //画海报 绘制一张空白的canvas画板
+                var c = document.getElementById("myCanvas");
+                c.width = 320;
+                c.height = 568;
+                var ctx = c.getContext("2d");
+                //背景
+                var img = new Image();
+                img.setAttribute('crossOrigin', 'anonymous');
+                var url = $("#goodsImg").attr('src');
+                img.src = url;
+                // 二维码
+                var canvas = document.getElementsByTagName("canvas")[0];
+                var codeimg = new Image();
+                codeimg.src = canvas.toDataURL("image/png");
+
+                img.onload = function () { //必须等待图片加载完成
+                    //绘制图像
+                    ctx.drawImage(img, 0, 0, 320, 568); //背景
+                    ctx.drawImage(codeimg, 100, 428, 120, 120); //二维码
+                }
+                setTimeout(function () {
+                    that.takeScreenshot()
+                }, 500);
+            },
+            //绘制完成,转为图片
+            takeScreenshot: function () {
+                var bigcan = document.getElementById("myCanvas");
+                var images = new Image();
+                images.src = bigcan.toDataURL("image/png");
+                $('.pic').attr('src', images.src);
+                document.getElementById("canbox").style.display = "none"; //隐藏画板
             }
         }
     });
@@ -491,6 +547,19 @@
         $('#mc_play').attr('class', 'on');
     }
 
+    function sharePic() {
+        $.modal({
+            title: "长按图片保存到相册，分享朋友圈现金红包",
+            text: '<img src="' + $(".pic").attr('src') +
+                '" style="width:100%;height:450px">',
+            buttons: [{
+                text: "取消",
+                className: "default",
+                onClick: function () {}
+            }, ]
+        });
+    }
+
     window.onload = function () {
         music_mp3 = document.getElementById('musicfx');
         setTimeout(function () {
@@ -500,7 +569,6 @@
 
     //倒计时
     function Timer(year, month, day, hour, minute, second) {
-
         var leftTime = (new Date(year, month - 1, day, hour, minute, second)) - (new Date()); //计算剩余的毫秒数 
         var days = parseInt(leftTime / 1000 / 60 / 60 / 24, 10); //计算剩余的天数 
         var hours = parseInt(leftTime / 1000 / 60 / 60 % 24, 10); //计算剩余的小时 
@@ -512,8 +580,10 @@
         seconds = checkTime(seconds);
 
         if (isNaN(days)) {} else {
-            document.getElementById("timer").innerHTML = "<h3>" + '<span style="color:red">' + days + '</span> ' +
-                "天 " + '<span style="color:red">' + hours + '</span> ' + "小时 " + '<span style="color:red">' +
+            document.getElementById("timer").innerHTML = "<h3>" + '<span style="color:red">' + days +
+                '</span> ' +
+                "天 " + '<span style="color:red">' + hours + '</span> ' + "小时 " +
+                '<span style="color:red">' +
                 minutes +
                 '</span> ' + "分 " + '<span style="color:red">' + seconds + '</span> ' + "秒" + "</h3>";
         }
@@ -548,20 +618,6 @@
         } else {
             return false;
         }
-    }
-
-    function sharePic() {
-        $.modal({
-            title: "长按图片保存到相册，分享朋友圈现金红包",
-            text: '<img src="http://qianniu.hebiysg.cn/FnQyPG4XduF9dJP57lqthLQgxvFO" style="width:100%;height:450px">',
-            buttons: [{
-                text: "取消",
-                className: "default",
-                onClick: function () {
-                    console.log(3)
-                }
-            }, ]
-        });
     }
 </script>
 

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>html2canvas example</title>
+    <script src="https://cdn.bootcss.com/jquery/1.11.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/html2canvas/0.4.1/html2canvas.min.js"></script>
+</head>
+
+<body>
+    <img id="shareBg" src="http://qianniu.hebiysg.cn/FnQyPG4XduF9dJP57lqthLQgxvFO" alt="">
+    <!-- 存放合成的图片 -->
+    <div class="share-img" id="shareImg"></div>
+    <button onclick="share()">分享</button>
+</body>
+<!-- 如果使用了某些拓展插件还需要额外的JS -->
+<script src="https://cdn.bootcss.com/jquery-weui/1.2.1/js/swiper.min.js"></script>
+<script src="https://cdn.bootcss.com/jquery-weui/1.2.1/js/jquery-weui.min.js"></script>
+<script>
+    function share() {
+        console.log($("#shareBg").attr('src'));
+        $.modal({
+            title: "长按图片保存到相册，分享朋友圈现金红包",
+            text: '<img src="'+$("#shareBg").attr('src')+'" style="width:100%;height:450px">',
+            buttons: [{
+                text: "取消",
+                className: "default",
+                onClick: function () {
+                    console.log(3)
+                }
+            }, ]
+        });
+    }
+</script>
+
+</html>
