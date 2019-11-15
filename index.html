@@ -395,13 +395,6 @@
                         } else {
                             onBridgeReady(response.data.data);
                         }
-                        $('#qrCode').qrcode({
-                            render: "table",
-                            height: 350,
-                            width: 350,
-                            correctLevel: 0,
-                            text: response.data.data.orderId
-                        });
                     })
                     .catch(function (error) {
                         console.log(error);
@@ -520,6 +513,13 @@
                     //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
                     $.toast("支付成功");
                     $("#formAdd").hide();
+                    $('#qrCode').qrcode({
+                        render: "table",
+                        height: 350,
+                        width: 350,
+                        correctLevel: 0,
+                        text: params.orderId
+                    });
                     $("#leftButton").html(
                         '<a href="javascript:;"' +
                         'style="background:rgba(20, 180, 68, 0.877);width: 100%;height: 40px;line-height:40px;"' +
