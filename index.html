@@ -188,7 +188,7 @@
                             <input class="weui-input" type="text" ref="userPhone" name="userPhone" placeholder="请输入手机号">
                         </div>
                     </div>
-                    <a href="javascript:;" @click="createOrder" class="weui-btn weui-btn_primary">确认提交</a>
+                    <a href="javascript:;" @click="createOrder" id="a_submit"class="weui-btn weui-btn_primary">确认提交</a>
                 </div>
             </div>
         </div>
@@ -365,6 +365,7 @@
             },
             //下单
             createOrder: function () {
+                $("#a_submit").addClass("weui-btn_disabled")
                 var order = {
                     "goodsId": goodsId,
                     "phone": this.$refs.userPhone.value,
