@@ -188,7 +188,7 @@
                             <input class="weui-input" type="text" ref="userPhone" name="userPhone" placeholder="请输入手机号">
                         </div>
                     </div>
-                    <a href="javascript:;" @click="createOrder" id="a_submit"class="weui-btn weui-btn_primary">确认提交</a>
+                    <a href="javascript:;" @click="createOrder" id="a_submit" class="weui-btn weui-btn_primary">确认提交</a>
                 </div>
             </div>
         </div>
@@ -252,7 +252,7 @@
     var goodsId = getQueryString('i');
     var code = getQueryString('code');
     var music_mp3;
-    var post_flag = false;
+    var post_flag = 0;
     var vm = new Vue({
         el: '#app',
         data: {
@@ -382,8 +382,8 @@
                     $.toast("请填写姓名", "text");
                     return;
                 }
-                if (post_flag) return; //如果正在提交则直接返回，停止执行
-                post_flag = true; //标记当前状态为正在提交状态
+                if (post_flag != 0) return; //如果正在提交则直接返回，停止执行
+                post_flag = 1; //标记当前状态为正在提交状态
                 axios.post(remote_url + '/h5/activity/order/add', order)
                     .then(function (response) {
                         if (typeof WeixinJSBridge == "undefined") {
@@ -401,7 +401,7 @@
                         console.log(error);
                         $.toast("网络错误", "forbidden");
                     });
-                post_flag = false; //如果正在提交则直接返回，停止执行
+                post_flag = 0; //如果正在提交则直接返回，停止执行
             },
             //获取签么
             getSign: function () {
