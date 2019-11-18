@@ -296,7 +296,7 @@
                     } else if (window.sessionStorage.getItem('userId') == null) {
                         this.createUser(code);
                     } else {
-                        this.getActivityGoods(goodsId);
+                        this.getUserInfo(window.sessionStorage.getItem('userId'));
                     }
                 } else {
                     $.toast("网址有误", "forbidden");
@@ -347,6 +347,22 @@
                         temp.openid = response.data.data.openid;
                         temp.isOrder = response.data.data.order;
                         temp.isManager = response.data.data.manager;
+                        window.sessionStorage.setItem('userId', response.data.data.userId);
+                    })
+                    .catch(function (error) {
+                        $.toast("网络错误", "forbidden");
+                    });
+            },
+            getUserInfo: function (userId) {
+                var temp = this;
+                let userId = 'userId=' + userId + '&goodsId=' + goodsId;
+                axios.post(remote_url + '/h5/activity/user/' + userId)
+                    .then(function (response) {
+                        temp.getActivityGoods(goodsId);
+                        temp.userId = response.data.data.userId;
+                        temp.openid = response.data.data.openid;
+                        temp.isOrder = response.data.data.order;
+                        temp.isManager = response.data.data.manager;
                         if (response.data.data.order) {
                             temp.orderCode = response.data.data.orderCode;
                             $('#qrCode').qrcode({
@@ -357,7 +373,6 @@
                                 text: temp.orderCode
                             });
                         }
-                        window.sessionStorage.setItem('userId', response.data.data.userId);
                     })
                     .catch(function (error) {
                         $.toast("网络错误", "forbidden");
@@ -366,6 +381,7 @@
             //下单
             createOrder: function () {
                 $("#a_submit").addClass("weui-btn_disabled")
+                if (post_flag != 0) return;
                 var order = {
                     "goodsId": goodsId,
                     "phone": this.$refs.userPhone.value,
